@@ -101,6 +101,12 @@ module MudPie
 			end
 		end
 		
+		def rescan_content_dir
+			@DEFAULTS = {}
+			@CONTENT_PATHS = []
+			scan_content_dir get_path('content_root')
+		end
+		
 		def items_for_path(pattern)
 			@CONTENT_PATHS.select { |p| pattern.match(p) }.map { |p| Item.new(p, self) }
 		end
