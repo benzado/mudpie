@@ -1,0 +1,9 @@
+Add a mechanism to exclude a file from either serving and/or baking. (Specifically for the rsd.xml file.)
+
+"mp deploy" to rsync to server.
+
+"mp serve hot" to generate pages on demand.
+
+"mp serve cold" to serve files in the output directory.
+
+
