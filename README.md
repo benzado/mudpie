@@ -20,7 +20,7 @@ Your site will live in a directory structure like this:
 
     site/
       content/
-      layout/
+      layouts/
       output/
 
 The command `mp bake site/` will copy all the files from `content/` to `output/`. If you have an existing site as static HTML, you could copy everything into `content/` and you'd already be in business!

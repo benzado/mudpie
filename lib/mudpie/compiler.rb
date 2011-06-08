@@ -22,7 +22,7 @@ module MudPie
 			@CONFIG = {
 				'plugin_path' => 'plugins',
 				'content_root' => 'content',
-				'layout_root' => 'layout',
+				'layouts_root' => 'layouts',
 				'output_root' => 'output',
 				'base_url' => 'http://localhost:3000',
 				'compile_extensions' => ['css', 'htm', 'html', 'xml'],
@@ -54,7 +54,7 @@ module MudPie
 		def template_for_layout(layout)
 			template = @LAYOUT_TEMPLATES[layout]
 			if (template.nil?) then
-				layout_path = get_path('layout_root', layout)
+				layout_path = get_path('layouts_root', layout)
 				template = ERB.new(File.new(layout_path), nil, "%<>")
 				template.filename = layout_path
 				@LAYOUT_TEMPLATES[layout] = template
@@ -115,8 +115,14 @@ module MudPie
 			puts "Compiling #{path}"
 			item = Item.new(path, self)
 			FileUtils.mkpath(File.dirname(item.output_path))
-			output = item.compiled_output
-			File.open(item.output_path, 'w') { |f| f.write(output) }
+			begin
+				output = item.compiled_output
+				File.open(item.output_path, 'w') { |f| f.write(output) }
+			rescue StandardError => e
+				puts "\tERROR: " + e.message
+				puts "\t" + e.backtrace.join("\n\t")
+				# TODO: filter backtrace to include only content and layouts
+			end
 		end
 		
 		def copy_path(path)

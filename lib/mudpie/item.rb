@@ -76,8 +76,8 @@ module MudPie
 		end
 
 		def default_layout
-			layout_name = 'default.' + @path.path_extension
-			default_layout_path = @compiler.get_path('layout_root', layout_name)
+			layout_name = '_.' + @path.path_extension
+			default_layout_path = @compiler.get_path('layouts_root', layout_name)
 			if File.exist? default_layout_path then
 				layout_name
 			else
