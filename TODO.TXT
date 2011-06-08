@@ -6,4 +6,4 @@ Add a mechanism to exclude a file from either serving and/or baking. (Specifical
 
 "mp serve cold" to serve files in the output directory.
 
-
+Support "more" and "summary" sections for blog posts.
