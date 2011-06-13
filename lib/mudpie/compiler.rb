@@ -1,4 +1,5 @@
 require 'mudpie/item'
+require 'mudpie/config'
 
 module MudPie
 	
@@ -9,30 +10,12 @@ module MudPie
 	class Compiler
 	
 		def initialize(site_root)
-			@SITE_ROOT = File.expand_path(site_root)
+			@CONFIG = Config.new(site_root)
 			@DEFAULTS = {}
 			@CONTENT_PATHS = []
 			@LAYOUT_TEMPLATES = {}
-			load_config
 			load_plugins
 			scan_content_dir get_path('content_root')
-		end
-		
-		def load_config
-			@CONFIG = {
-				'plugin_path' => 'plugins',
-				'content_root' => 'content',
-				'layouts_root' => 'layouts',
-				'output_root' => 'output',
-				'base_url' => 'http://localhost:3000',
-				'compile_extensions' => ['css', 'htm', 'html', 'xml'],
-				'ignore_filenames' => ['.DS_Store']
-			}
-			config_path = @SITE_ROOT.append_path_component('config.yml')
-			if File.exist? config_path then
-				puts "Loading configuration #{config_path}"
-				@CONFIG.merge!(YAML.parse_file(config_path).transform)
-			end
 		end
 		
 		def base_url
@@ -40,15 +23,7 @@ module MudPie
 		end
 		
 		def get_path(name, subpath = nil)
-			p = @CONFIG[name]
-			if p[0] != '/' then
-				p = @SITE_ROOT.append_path_component(p)
-			end
-			if subpath then
-				p.append_path_component(subpath)
-			else
-				p
-			end
+			@CONFIG.get_path(name, subpath)
 		end
 
 		def template_for_layout(layout)

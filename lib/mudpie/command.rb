@@ -1,5 +1,6 @@
 require 'mudpie/compiler'
 require 'mudpie/server'
+require 'mudpie/config'
 
 module MudPie
 
@@ -48,6 +49,24 @@ class Command
 		puts "Serving site at #{path}"
 		s = Server.new(path)
 		s.start
+	end
+	
+	def do_deploy
+		path = @argv.shift || '.'
+		puts "Deploying site at #{path}"
+		config = Config.new(path)
+		rsync_opts = %w{
+			--verbose --human-readable --progress
+			--checksum --compress
+			--recursive
+			--update
+			--times --omit-dir-times
+		}.join(' ')
+		output_path = config.get_path('output_root')
+		deploy_root = config['deploy_root']
+		upload_command = "rsync #{rsync_opts} #{output_path}/ #{deploy_root}/"
+		puts "Executing `#{upload_command}`"
+		#system upload_command
 	end
 
 end
