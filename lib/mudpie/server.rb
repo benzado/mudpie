@@ -27,6 +27,8 @@ module MudPie
 		
 	end
 
+	# TODO: add plug-in hook, so that blog entries can be rendered here
+
 	class LiveServlet < WEBrick::HTTPServlet::FileHandler
 	
 		def initialize(server)

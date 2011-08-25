@@ -13,6 +13,8 @@ module MudPie
 				'base_url' => 'http://localhost:3000',
 				'ignore_filenames' => ['.DS_Store']
 			}
+			# TODO: add hook to decouple from blogging plug-in
+			@STORE['posts_root'] = 'posts'
 			config_path = @SITE_ROOT.append_path_component('config.yml')
 			if File.exist? config_path then
 				puts "Loading configuration #{config_path}"

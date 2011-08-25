@@ -9,12 +9,6 @@ module MudPie
 		def initialize(path, compiler)
 			@path = path
 			@compiler = compiler
-			@url = @compiler.base_url + path
-			if File.exist? source_path then
-				@datetime = File.mtime source_path
-			else
-				@datetime = Time.now
-			end
 		end
 		
 		def [](symbol)
@@ -41,6 +35,10 @@ module MudPie
 				istr = isymbol.to_s
 				istr[1,istr.length-1].to_sym
 			end - SYSTEM_SYMBOLS
+		end
+		
+		def url
+			@compiler.base_url + path
 		end
 
 		def source_path

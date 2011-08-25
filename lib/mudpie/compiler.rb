@@ -90,13 +90,8 @@ module MudPie
 			scan_content_dir get_path('content_root')
 		end
 		
-		def items_for_path(pattern)
-			@SOURCE_PATHS.select { |p| pattern.match(p) }.map { |p| Item.new(p, self) }
-		end
-
-		def compile_path(path)
-			puts "Compiling #{path}"
-			item = Item.new(path, self)
+		def compile_item(item)
+			puts "Compiling #{item.path} from #{item.source_path}"
 			FileUtils.mkpath(File.dirname(item.output_path))
 			begin
 				output = item.compiled_output
@@ -106,6 +101,10 @@ module MudPie
 				puts "\t" + e.backtrace.join("\n\t")
 				# TODO: filter backtrace to include only content and layouts
 			end
+		end
+		
+		def compile_path(path)
+			compile_item Item.new(path, self)
 		end
 		
 		def copy_path(path)
@@ -124,6 +123,8 @@ module MudPie
 		def update_all
 			@SOURCE_PATHS.each { |p| compile_path p }
 			@RESOURCE_PATHS.each { |p| copy_path p }
+			# TODO: decouple this from blogging plug-in
+			@blog_items.each { |i| compile_item i }
 		end
 	
 	end
