@@ -41,7 +41,7 @@ module MudPie
 		end
 		
 		def write_item(item, body)
-			fullpath = item.content_path
+			fullpath = item.source_path
 			FileUtils.mkpath(File.dirname(fullpath))
 			File.open(fullpath, 'w') do |f|
 				item.properties.each do |k|
@@ -77,7 +77,7 @@ module MudPie
 		
 		def delete_item_for_id(postid)
 			item = item_for_id(postid)
-			FileUtils.rm(item.content_path)
+			FileUtils.rm(item.source_path)
 			@compiler.flush_blog_items
 			@compiler.rescan_content_dir
 			true

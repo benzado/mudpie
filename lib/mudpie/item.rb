@@ -10,8 +10,8 @@ module MudPie
 			@path = path
 			@compiler = compiler
 			@url = @compiler.base_url + path
-			if File.exist? content_path then
-				@datetime = File.mtime content_path
+			if File.exist? source_path then
+				@datetime = File.mtime source_path
 			else
 				@datetime = Time.now
 			end
@@ -43,7 +43,7 @@ module MudPie
 			end - SYSTEM_SYMBOLS
 		end
 
-		def content_path
+		def source_path
 			@compiler.get_path('content_root', @path + '.mp')
 		end
 
@@ -58,8 +58,8 @@ module MudPie
 		end
 
 		def load_content
-			t = ERB.new(File.new(self.content_path), nil, "%<>")
-			t.filename = self.content_path
+			t = ERB.new(File.new(self.source_path), nil, "%<>")
+			t.filename = self.source_path
 			t.result binding
 		end
 
