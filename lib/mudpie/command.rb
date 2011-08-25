@@ -12,6 +12,7 @@ usage: mp <command> [<args>]
 commands:
     bake    Compiles site content into the output directory.
     serve   Starts a web server for testing the site.
+    deploy	Deploys site to production server.
     help    Prints this help text.
 
 END_HELP_TEXT
@@ -51,6 +52,8 @@ class Command
 		s.start
 	end
 	
+	# Ideally, we should bake to a temporary directory and then deploy.
+
 	def do_deploy
 		path = @argv.shift || '.'
 		puts "Deploying site at #{path}"
@@ -66,7 +69,7 @@ class Command
 		deploy_root = config['deploy_root']
 		upload_command = "rsync #{rsync_opts} #{output_path}/ #{deploy_root}/"
 		puts "Executing `#{upload_command}`"
-		#system upload_command
+		system upload_command
 	end
 
 end
