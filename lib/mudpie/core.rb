@@ -6,7 +6,7 @@ class String
 	end
 
 	def path_extension
-		i = self.index('.')
+		i = self.rindex('.')
 		if i then
 			j = i + 1
 			self[j, self.length - j]

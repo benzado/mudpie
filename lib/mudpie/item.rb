@@ -44,7 +44,7 @@ module MudPie
 		end
 
 		def content_path
-			@compiler.get_path('content_root', @path)
+			@compiler.get_path('content_root', @path + '.mp')
 		end
 
 		def output_path

@@ -5,14 +5,15 @@ module MudPie
 	
 	FILTERS = {}
 	
-	DEFAULTS_FILENAME_PATTERN = %r{^defaults\.?(.*)\.yml$};
+	DEFAULTS_FILENAME_PATTERN = %r{^defaults\.?(.+)\.yml$};
 	
 	class Compiler
 	
 		def initialize(site_root)
 			@CONFIG = Config.new(site_root)
 			@DEFAULTS = {}
-			@CONTENT_PATHS = []
+			@SOURCE_PATHS = [] # files to be compiled
+			@RESOURCE_PATHS = [] # files to be copied
 			@LAYOUT_TEMPLATES = {}
 			load_plugins
 			scan_content_dir get_path('content_root')
@@ -38,9 +39,10 @@ module MudPie
 		end
 		
 		def defaults_for_path(path)
-			# baked in system defaults
+			# if there were any fixed system defaults, they would go here
 			metadata = {}
-			# add for each directory
+			# add defaults for each directory, top to bottom (so bottom takes
+			# precedence)
 			extension = path.path_extension
 			i = path.index('/')
 			while not i.nil? do
@@ -63,27 +65,33 @@ module MudPie
 		
 		def scan_content_dir(root, dir_path = '/')
 			Dir.foreach(root + dir_path) do |name|
+				# skip self and parent directories
 				next if (name == '.' or name == '..')
+				# skip ignored files, like .DS_Store
 				next if (@CONFIG['ignore_filenames'].include? name)
 				path = dir_path.append_path_component(name)
 				if (File.directory?(root + path)) then
 					scan_content_dir root, path
 				elsif (m = DEFAULTS_FILENAME_PATTERN.match(name)) then
+					# if it is a defaults.*.yml file, load it
 					@DEFAULTS[m[1] + dir_path] = YAML.parse_file(root + path).transform
+				elsif (path.end_with? '.mp') then
+					@SOURCE_PATHS.push path[0, path.length - 3]
 				else
-					@CONTENT_PATHS.push path
+					@RESOURCE_PATHS.push path
 				end
 			end
 		end
 		
 		def rescan_content_dir
 			@DEFAULTS = {}
-			@CONTENT_PATHS = []
+			@SOURCE_PATHS = []
+			@RESOURCE_PATHS = []
 			scan_content_dir get_path('content_root')
 		end
 		
 		def items_for_path(pattern)
-			@CONTENT_PATHS.select { |p| pattern.match(p) }.map { |p| Item.new(p, self) }
+			@SOURCE_PATHS.select { |p| pattern.match(p) }.map { |p| Item.new(p, self) }
 		end
 
 		def compile_path(path)
@@ -113,20 +121,9 @@ module MudPie
 			FileUtils.cp content_path, output_path
 		end
 		
-		def should_compile(path)
-			@CONFIG['compile_extensions'].include? path.path_extension
-		end
-		
-		def update_path(path)
-			if should_compile path then
-				compile_path path
-			else
-				copy_path path
-			end
-		end
-		
 		def update_all
-			@CONTENT_PATHS.each { |path| update_path path }
+			@SOURCE_PATHS.each { |p| compile_path p }
+			@RESOURCE_PATHS.each { |p| copy_path p }
 		end
 	
 	end

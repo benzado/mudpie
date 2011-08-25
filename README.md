@@ -1,20 +1,38 @@
-mudpie
-======
+# Mud Pie
 
-mudpie is a *dirt simple* tool for making [baked websites](http://inessential.com/2011/03/16/a_plea_for_baked_weblogs).
+Mud Pie is a *dirt simple* tool for making [baked
+websites](http://inessential.com/2011/03/16/a_plea_for_baked_weblogs).
 
 (See also: [Bake, Don't Fry](http://www.aaronsw.com/weblog/000404).)
 
-There are literally dozens of similar tools out there that accomplish the same task. So why did I write this? Because I don't want to spend a lot of time learning arcane rules for how a source file becomes an output file, and where it is saved.
+There are literally dozens of similar tools that accomplish this same task. So
+why did I write this? Mostly because I don't want to learn a lot of arcane rules
+about how a source file becomes an output file, and where it is saved.
 
-mudpie employs a very simple rule: every file in your content directory corresponds to a file in your output directory, with the exact same name. There is no need for a `Rules` file to contain routing information, because there is exactly one route for a source file to take.
+Mud Pie employs a very simple rule: every file in your content directory
+corresponds to at least one file in your output directory. If the file name ends
+with `.mp`, it is compiled; otherwise it is simply copied.
 
-Source files that are not compiled are simply copied. So you are free to include your image and font files along with your source files, and mudpie will do the right thing.
+For example,
 
-mudpie is currently alpha-grade software: I pretty much just wrote it.
+- `foo/bar.html.mp` is compiled to `foo/bar.html`,
+- `foo/baz.png` is copied to `foo/baz.png`.
 
-How it works
-------------
+Compiling means we process the file using Ruby's IRB templating system. A simple
+`hello-world.html.mp` might look like this:
+
+    % @title = 'My First Web Page'
+    
+    Hello, world!
+
+Lines that start with `%` are interpreted as Ruby code, and variables set will
+be visible to later template files that are used to lay out the page.
+
+Mud Pie is currently alpha-grade software. I'm using it to maintain [the Heroic
+Software website](http://heroicsoftware.net/), but I'm not above breaking
+compatibility as I figure out what works and what doesn't.
+
+## How it works
 
 Your site will live in a directory structure like this:
 
@@ -23,17 +41,19 @@ Your site will live in a directory structure like this:
       layouts/
       output/
 
-The command `mp bake site/` will copy all the files from `content/` to `output/`. If you have an existing site as static HTML, you could copy everything into `content/` and you'd already be in business!
+The command `mp bake site/` will copy all the files from `content/` to
+`output/`. If you have an existing site as static HTML, you could copy
+everything into `content/` and you'd already be in business!
 
 Let's say you add some files:
 
     site/
       config.yml
       content/
-        index.html
-        cats.html
+        index.html.mp
+        cats.html.mp
       layout/
-        default.html
+        _.html
       output/
 
 You know what, I need to stop here and go to sleep. I'll write more later.

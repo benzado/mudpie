@@ -11,7 +11,6 @@ module MudPie
 				'layouts_root' => 'layouts',
 				'output_root' => 'output',
 				'base_url' => 'http://localhost:3000',
-				'compile_extensions' => ['css', 'htm', 'html', 'xml'],
 				'ignore_filenames' => ['.DS_Store']
 			}
 			config_path = @SITE_ROOT.append_path_component('config.yml')

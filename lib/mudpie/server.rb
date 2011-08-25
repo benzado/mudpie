@@ -41,12 +41,10 @@ module MudPie
 			end
 			content_path = @compiler.get_path('content_root', path)
 			if File.exists? content_path then
-				if @compiler.should_compile path then
-					item = Item.new(path, @compiler)
-					res.body = item.compiled_output
-				else
-					super(req, res)
-				end
+				super(req, res)
+			elsif File.exists? content_path + '.mp' then
+				item = Item.new(path[0, path.length - 3], @compiler)
+				res.body = item.compiled_output
 			else
 				raise WEBrick::HTTPStatus::NotFound
 			end
