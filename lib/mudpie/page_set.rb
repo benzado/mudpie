@@ -21,6 +21,8 @@ class PageSet
 		pages
 	end
 
+	# TODO: figure out how to return self from to_liquid and pretend to be an array
+
 	def has_key?(key)
 		puts "PageSet<#{@key},#{@value}> test for #{key}"
 		key == 'size'

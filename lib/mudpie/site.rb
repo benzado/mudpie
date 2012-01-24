@@ -18,11 +18,7 @@ class Site
 	end
 
 	def layout(name)
-		layout = @layouts[name]
-		if layout.nil? then
-			layout = Layout.new(self, name)
-		end
-		layout
+		@layouts[name] || (@layouts[name] = Layout.new(self, name))
 	end
 
 	def update_index

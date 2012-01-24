@@ -1,7 +1,5 @@
 module MudPie
 
-FILTERS = {}
-
 class Page < SourceFile
 
 	def initialize(site, entry)
@@ -14,19 +12,12 @@ class Page < SourceFile
 		@entry.url
 	end
 
-	def filter
-		# TODO: make this pluggable, store filters on Site
+	def format_proc
 		name = ymf_data['filter']
-		if name then
-			filter = FILTERS['.' + name]
-			if filter.nil? then
-				puts "WARNING: filter `#{name}` not found"
-			end
-		else
-			filter = FILTERS[File.extname @path]
-			# don't warn on an implicit lookup
+		if name && !Formats.has_key?('.' + name) then
+			puts "WARNING: filter `#{name}` not found"
 		end
-		filter || lambda { |item, text| text }
+		Formats[name || (File.extname @path)]
 	end
 
 	def needs_render?(dst_path)
@@ -45,7 +36,7 @@ class Page < SourceFile
 			# Step 1: run it through liquid
 			content = Layout.render(@site, raw_content, context)
 			# Step 2: filter if necessary
-			content = (self.filter).call self, content
+			content = format_proc.call self, content
 			# Step 3: render layout (optional)
 			layout_name = ymf_data['layout']
 			if embed_in_layout && layout_name && layout_name != 'nil' then
@@ -114,14 +105,6 @@ class Page < SourceFile
 		end
 	end
 
-end
-
-if require 'markdown' then
-	FILTERS['.md'] = FILTERS['.markdown'] = if require 'rubypants' then
-		lambda { |item, text| RubyPants.new(Markdown.new(text).to_html).to_html }
-	else
-		lambda { |item, text| Markdown.new(text).to_html }
-	end
 end
 
 end # module

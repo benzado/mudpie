@@ -2,6 +2,8 @@ module MudPie
 
 class Index
 
+	SELECT_FILES_SQL = 'SELECT `id`,`size`,`mtime`,`ymf_len`,`collection_name`,`url`,`date`,`path` FROM `files`'
+
 	def initialize(site)
 		@site = site
 		db_path = @site.config['index_path']
@@ -16,7 +18,7 @@ class Index
 			end
 			@db.execute_batch sql
 		end
-		@files_select = @db.prepare('SELECT `id`,`size`,`mtime`,`ymf_len`,`collection_name`,`url`,`date` FROM `files` WHERE `path` = ?')
+		@files_select = @db.prepare(SELECT_FILES_SQL + ' WHERE `path` = ?')
 		@files_insert = @db.prepare('INSERT INTO `files` (`size`,`mtime`,`ymf_len`,`collection_name`,`url`,`date`,`path`) VALUES (?,?,?,?,?,?,?)')
 		@files_update = @db.prepare('UPDATE `files` SET `size` = ?,`mtime` = ?,`ymf_len` = ?,`collection_name`=?,`url`=?,`date`=? WHERE `path` = ?')
 		@md_delete = @db.prepare('DELETE FROM `metadata` WHERE `file_id` = ?')
@@ -110,8 +112,7 @@ class Index
 		page
 	end
 
-#------
-
+	# unused
 	def ymf_data_for_file_id(id)
 		ymf_data = {}
 		@md_select_file.execute!(file_id) do |row|
@@ -129,6 +130,7 @@ class Index
 		ymf_data
 	end
 
+	# unused
 	def ymf_value_for_file_id_and_key(id, key)
 		values = []
 		@md_select_file_key.execute!(file_id, key) do |row|
@@ -143,8 +145,6 @@ class Index
 			nil
 		end
 	end
-
-	SELECT_FILES_SQL = 'SELECT `id`,`size`,`mtime`,`ymf_len`,`collection_name`,`url`,`date`,`path` FROM `files`'
 
 	def each(stmt = nil)
 		if stmt.nil? then
@@ -168,13 +168,13 @@ class Index
 	end
 
 	def all_posts
-		where = " WHERE `path` LIKE '~_posts/%' ESCAPE '~'"
+		where = " WHERE `collection_name` = 'posts' ORDER BY `date` DESC"
 		all @db.prepare(SELECT_FILES_SQL + where)
 	end
 
 	def all_for_key_and_value(key, value)
 		join_sql = ' JOIN metadata ON metadata.file_id = files.id'
-		where_sql = ' WHERE key = ? AND value = ?'
+		where_sql = ' WHERE `key` = ? AND `value` = ? ORDER BY `date` DESC'
 		stmt = @db.prepare(SELECT_FILES_SQL + join_sql + where_sql)
 		stmt.bind_param 1, key
 		stmt.bind_param 2, value

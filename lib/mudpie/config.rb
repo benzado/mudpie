@@ -9,7 +9,7 @@ class Config
 		'includes_root' => '_includes',
 		'index_path' => '_index.db',
 		'layouts_root' => '_layouts',
-		'permalink' => '/:year/:title.html',
+		'permalink' => '/:year/:month/:day/:title.html',
 		'server_port' => 3000
 	}
 
@@ -23,7 +23,6 @@ class Config
 			src_root = File.dirname path
 			config_path = File.basename path
 		end
-		# system defaults
 		@STORE = DEFAULTS.clone
 		@STORE['src_root'] = src_root # a dynamic default
 		Dir.chdir self['src_root']

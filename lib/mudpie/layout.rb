@@ -26,22 +26,19 @@ class Layout < SourceFile
 		@template
 	end
 
-	def render(content, context)
+	def render(content, page_context)
 		puts "  Embedding in #{@path}"
-		ctx = {}
-		ctx.merge!(ymf_data)
-		ctx.merge!(context)
-		ctx.merge!({ 'content' => content })
+		context = ymf_data.merge page_context
+		context['content'] = content
 		begin
-			output = self.template.render! ctx, (Layout.opts @site)
+			output = self.template.render! context, (Layout.opts @site)
 		rescue => e
 			puts "Liquid Exception: #{e.message} in layout #{@path}"
-			puts e
 		end
 		parent_layout_name = ymf_data['layout']
 		if parent_layout_name then
 			parent_layout = @site.layout parent_layout_name
-			parent_layout.render output, ctx
+			parent_layout.render output, context
 		else
 			output
 		end

@@ -5,12 +5,12 @@ MudPie v#{VERSION}
 
 Usage:
 
-    mp <command> [<config-path>]
+    mudpie <command> [<config-path>]
 
 Commands:
 
     bake - compiles site content into the output directory
-    clean - deletes the index database
+    clean - deletes the index database and output directory
     serve hot - starts a local webserver that builds pages on demand
     serve cold - starts a local webserver pointed at the output directory
     help - prints this help text

@@ -1,5 +1,8 @@
 require 'uri'
 
+# Filters available to Liquid templates. This code is largely borrowed from
+# the Jekyll project.
+
 module MudPie
 
   module Filters
