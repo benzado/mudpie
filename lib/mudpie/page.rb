@@ -12,6 +12,10 @@ class Page < SourceFile
 		@entry.url
 	end
 
+	def collection_name
+		@entry.collection_name
+	end
+
 	def format_proc
 		name = ymf_data['filter']
 		if name && !Formats.has_key?('.' + name) then

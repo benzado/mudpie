@@ -9,7 +9,7 @@ class Config
 		'includes_root' => '_includes',
 		'index_path' => '_index.db',
 		'layouts_root' => '_layouts',
-		'permalink' => '/:year/:month/:day/:title.html',
+		'permalink' => '/:categories/:year/:month/:day/:title.html',
 		'server_port' => 3000
 	}
 

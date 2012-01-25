@@ -68,34 +68,48 @@ class Site
 	end
 
 	def categories_for_page(page)
-		cats = (page.ymf_data['categories']) || (page.ymf_data['category'])
-		if cats.kind_of? Array then
-			cats
-		else
-			[cats]
-		end
+		(page.ymf_data['categories'] || page.ymf_data['category']).to_a
 	end
 
 	def url_for_page(page)
-		p = page.ymf_data['permalink']
-		if p.nil? then
-			if page.path[0,7] == '_posts/' then # TODO: handle other collections
-				p = @config['permalink'].clone
-				date = date_for_page(page)
-				{
-					':year' => date.strftime('%Y'),
-					':month' => date.strftime('%m'),
-					':day' => date.strftime('%d'),
-					':title' => slug_for_page(page),
-					':categories' => (categories_for_page page).join('/')
-				}.each_pair { |k,v| p.gsub!(k, v) }
-				p.gsub!(/^\//, '')
+		# if the file defines a permalink, use it
+		url = page.ymf_data['permalink']
+		return url unless url.nil?
+		# does the file belong to a collection?
+		collection_name = collection_name_for_page page
+		if collection_name.nil? then
+			# if not, just use the file path
+			path = page.path
+			if Formats.has_key? File.extname path then
+				'/' + path.gsub(/\..+$/, '.html')
 			else
-				p = page.path.clone
-				p.gsub!(/\.md$/, '.html') # TODO: recognize all markup extensions
+				'/' + path
 			end
+		else
+			# if so, use the permalink config option
+			template = @config['permalink'] # TODO: collection-specific settings
+			date = date_for_page page
+			('/' + template).gsub(/:(i_)?[a-z]+/) do |tag|
+				case tag
+				when ':categories'
+					(categories_for_page page).join('/')
+				when ':day'
+					date.strftime('%d')
+				when ':i_day'
+					date.strftime('%d').to_i
+				when ':i_month'
+					date.strftime('%m').to_i
+				when ':month'
+					date.strftime('%m')
+				when ':title'
+					slug_for_page page
+				when ':year'
+					date.strftime('%Y')
+				else
+					raise "Unknown permalink tag '#{tag}'"
+				end
+			end.gsub(%r{//+}, '/') # collapse double slashes
 		end
-		('/' + p)
 	end
 
 	def collection_name_for_page(page)
@@ -119,8 +133,6 @@ class Site
 				dst_parent = File.dirname dst_path
 				FileUtils.mkdir_p dst_parent unless File.exists? dst_parent
 				item.render_to dst_path
-			else
-				puts "Up to date: #{dst_path}"
 			end
 		end
 	end
