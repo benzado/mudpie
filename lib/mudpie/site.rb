@@ -96,7 +96,7 @@ class Site
 				when ':day'
 					date.strftime('%d')
 				when ':i_day'
-					date.strftime('%d').to_i
+					date.strftime('%e')
 				when ':i_month'
 					date.strftime('%m').to_i
 				when ':month'
