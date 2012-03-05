@@ -18,20 +18,20 @@ class Config
 		path = File.expand_path rel_path
 		if File.directory? path then
 			src_root = path
-			config_path = '_config.yml'
+			config_path = File.join(path, '_config.yml')
 		else
 			src_root = File.dirname path
-			config_path = File.basename path
+			config_path = path
 		end
 		@STORE = DEFAULTS.clone
-		@STORE['src_root'] = src_root # a dynamic default
-		Dir.chdir self['src_root']
-		puts "Working from directory #{Dir.pwd}"
+		@STORE['source'] = src_root # a dynamic default
 		if File.file? config_path then
 			puts "Loading configuration from #{config_path}"
 			@STORE.merge!(YAML.parse_file(config_path).transform)
 			@STORE['exclude'] << '.git'
 		end
+		Dir.chdir self['source']
+		puts "Working from directory #{Dir.pwd}"
 	end
 
 	def has_key?(key)
