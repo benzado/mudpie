@@ -9,6 +9,10 @@ require 'yaml'
 require 'liquid'
 require 'sqlite3'
 
+module MudPie
+  VERSION = '2.0'
+end
+
 # equip the kitchen
 require 'mudpie/command'
 require 'mudpie/config'
@@ -23,12 +27,13 @@ require 'mudpie/source_file'
   require 'mudpie/page'
   require 'mudpie/layout'
 
-module MudPie
-	VERSION = '2.0'
-end
+# plugins
 
 # tags
 glob = File.join(File.dirname(__FILE__), 'mudpie/tags/*.rb')
 Dir[glob].each do |f|
-	require f
+  require f
 end
+
+# TODO: filters/converters/formats
+# TODO: generators
