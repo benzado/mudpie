@@ -79,12 +79,13 @@ class Index
 		size = (File.size path)
 		mtime = (File.mtime path).to_i
 		return if up_to_date?(previous_entry, mtime, size)
+		file = SourceFile.new(path)
+		return if file.ymf_data['published'] === false
 		if previous_entry then
 			puts "Updating #{path}"
 		else
 			puts "Adding #{path}"
 		end
-		file = SourceFile.new(path)
 		entry = IndexEntry.new
 		entry.id = previous_entry.id unless previous_entry.nil?
 		entry.path = path
