@@ -38,6 +38,7 @@ class Page < SourceFile
       puts "Copying #{dst_path}"
       begin
         FileUtils.cp @path, dst_path
+        File.utime(@entry.mtime, @entry.mtime, dst_path)
       rescue => e
         puts "ERROR: #{e}"
       end
@@ -47,6 +48,7 @@ class Page < SourceFile
       File.open(dst_path, 'w') do |f|
         f.write content
       end
+      File.utime(@entry.mtime, @entry.mtime, dst_path)
     end
   end
 
