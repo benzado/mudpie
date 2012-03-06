@@ -67,7 +67,7 @@ class Index
           @md_insert.execute!(file_id, key, i, value[i])
         end
       elsif value.is_a? Hash then
-        puts "WARNING: #{path}: YAML key `#{key}`: hashes not supported."
+        puts "WARNING: #{@path}: YAML key `#{key}`: hashes not supported."
       else
         @md_insert.execute!(file_id, key, nil, value)
       end
