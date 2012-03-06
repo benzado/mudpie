@@ -32,26 +32,6 @@ class Page < SourceFile
     end
   end
 
-  def rendered_content(embed_in_layout = true)
-    if ymf_len == 0 then
-      File.read @path
-    else
-      context = { 'site' => @site, 'page' => self }
-      # Step 1: run it through liquid
-      content = Layout.render(@site, raw_content, context)
-      # Step 2: filter if necessary
-      content = format_proc.call self, content
-      # Step 3: render layout (optional)
-      layout_name = ymf_data['layout']
-      if embed_in_layout && layout_name && layout_name != 'nil' then
-        layout = @site.layout layout_name
-        layout.render content, context
-      else
-        content
-      end
-    end
-  end
-
   def render_to(dst_path)
     if ymf_len == 0 then
       # File has no YMF, so just do a straight copy.
@@ -66,6 +46,30 @@ class Page < SourceFile
       content = rendered_content
       File.open(dst_path, 'w') do |f|
         f.write content
+      end
+    end
+  end
+
+  def rendered_content(embed_in_layout = true)
+    if ymf_len == 0 then
+      File.read @path
+    else
+      # Step 1: run it through liquid
+      template = Liquid::Template.parse raw_content
+      content = begin
+        context = { 'site' => @site, 'page' => self }
+        template.render!(context, { :filters => [MudPie::Filters] })
+      rescue => e
+        puts "Liquid Exception: #{e.message} in page #{@path}"
+        puts "  " + e.backtrace.join("\n  ")
+      end
+      # Step 2: filter if necessary
+      content = format_proc.call self, content
+      # Step 3: render layout (optional)
+      if embed_in_layout && layout then
+        layout.render content, self
+      else
+        content
       end
     end
   end
@@ -88,8 +92,10 @@ class Page < SourceFile
     self
   end
 
+  BUILTIN_KEYS = %w[content date id title url]
+
   def has_key?(key)
-    true
+    BUILTIN_KEYS.include?(key) || super(key)
   end
 
   def [](key)
@@ -105,7 +111,7 @@ class Page < SourceFile
     when 'url'
       @entry.url
     else
-      ymf_data[key]
+      super(key)
     end
   end
 

@@ -148,10 +148,7 @@ class Index
   end
 
   def each(stmt = nil)
-    if stmt.nil? then
-      stmt = @db.prepare(SELECT_FILES_SQL)
-    end
-    stmt.execute! do |row|
+    (stmt || @db.prepare(SELECT_FILES_SQL)).execute! do |row|
       entry = entry_from_row row, row[7]
       yield Page.new(@site, entry)
     end

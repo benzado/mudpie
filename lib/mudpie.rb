@@ -4,6 +4,7 @@ require 'rubygems'
 # stdlib
 require 'fileutils'
 require 'yaml'
+YAML::ENGINE.yamler = 'syck'
 
 # dependencies
 require 'liquid'

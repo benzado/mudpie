@@ -18,6 +18,7 @@ class Site
   end
 
   def layout(name)
+    return nil if name == 'nil'
     @layouts[name] || (@layouts[name] = Layout.new(self, name))
   end
 
@@ -36,13 +37,22 @@ class Site
       if File.directory? path then
         index_dir path
       else
-        index_file path
+        # if we don't ensure UTF-8, some strings might be saved as SQLite BLOBs
+        index_file path.encode('UTF-8')
       end
     end
   end
 
   def index_file(path)
-    @index.update_file(path)
+    begin
+      @index.update_file(path)
+    rescue => e
+      puts '=' * 40
+      puts "Error while indexing #{path}"
+      puts '  ' + e.message
+      puts '  ' + e.backtrace.join("\n  ")
+      puts '=' * 40
+    end
   end
 
   POST_FILENAME_PATTERN = %r{^(\d{4}-\d{1,2}-\d{2})-([^.]+)}
@@ -68,7 +78,8 @@ class Site
   end
 
   def categories_for_page(page)
-    (page.ymf_data['categories'] || page.ymf_data['category']).to_a
+    c = (page.ymf_data['categories'] || page.ymf_data['category'] || [])
+    if c.is_a? Array then c else [c] end
   end
 
   def url_for_page(page)
@@ -144,16 +155,10 @@ class Site
     self
   end
 
+  BUILTIN_KEYS = %w[pages posts related_posts time categories tags]
+
   def has_key?(key)
-    builtins = [
-      'pages',         # array of all pages
-      'posts',         # array of all posts, in reverse chrono order
-      'related_posts', # an array of posts related to the current post
-      'time',          # time the site was built
-      'categories',    # a hash of category name => array of posts
-      'tags'           # a hash of tag name => array of posts
-    ]
-    (builtins.include? key) || (@config.has_key? key)
+    BUILTIN_KEYS.include?(key) || @config.has_key?(key)
   end
 
   def [](key)
@@ -165,11 +170,11 @@ class Site
     when 'related_posts'
       puts 'WARNING: site.related_posts not yet implemented'
       []
-    when 'time'
+    when 'time' # time the site was built
       @time
-    when 'categories'
+    when 'categories' # a hash of category name => array of posts
       @index.all_posts_by_category
-    when 'tags'
+    when 'tags' # a hash of tag name => array of posts
       @index.all_posts_by_tag
     else
       @config[key]

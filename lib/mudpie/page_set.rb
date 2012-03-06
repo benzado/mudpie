@@ -9,32 +9,11 @@ class PageSet
   end
 
   def pages
-    @pages || (@pages = @index.all_for_key_and_value @key, @value)
-  end
-
-  def count
-    pages.length
+    @pages ||= @index.all_for_key_and_value @key, @value
   end
 
   def to_liquid
-    puts "PageSet<#{@key},#{@value}> building set" if @pages.nil?
     pages
-  end
-
-  # TODO: figure out how to return self from to_liquid and pretend to be an array
-
-  def has_key?(key)
-    puts "PageSet<#{@key},#{@value}> test for #{key}"
-    key == 'size'
-  end
-
-  def [](key)
-    case key
-    when 'size'
-      count
-    else
-      pages[key]
-    end
   end
 
 end
