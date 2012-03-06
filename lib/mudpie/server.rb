@@ -24,6 +24,7 @@ class HotServlet < WEBrick::HTTPServlet::FileHandler
   def initialize(server)
     super(server, '.')
     @site = server.site
+    @site.reload_layouts
     @site.update_index
   end
 

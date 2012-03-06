@@ -22,6 +22,10 @@ class Site
     @layouts[name] || (@layouts[name] = Layout.new(self, name))
   end
 
+  def reload_layouts
+    @layouts.clear
+  end
+
   def update_index
     index_dir nil
   end
