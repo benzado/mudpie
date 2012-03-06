@@ -11,12 +11,16 @@ class SourceFile
 
   def ymf_len
     @ymf_len ||= begin
-      f = File.open(path, 'r')
-      if f.readline == "---\n" then
-        while f.readline != "---\n" do end
-        f.tell
-      else
+      if File.zero? path then
         0
+      else
+        f = File.open(path, 'r')
+        if f.readline == "---\n" then
+          while f.readline != "---\n" do end
+          f.tell
+        else
+          0
+        end
       end
     end
   end
