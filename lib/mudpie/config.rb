@@ -4,7 +4,7 @@ class Config
 
   DEFAULTS = {
     'collections' => ['_posts'],
-    'destination' => '_site~mp',
+    'destination' => '_site',
     'exclude' => ['.DS_Store', '.git', '.gitignore'],
     'includes_root' => '_includes',
     'index_path' => '_index.db',
