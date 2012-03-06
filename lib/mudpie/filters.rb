@@ -1,6 +1,6 @@
 require 'uri'
 
-# Filters available to Liquid templates. This code is largely borrowed from
+# Filters available to Liquid templates. This file includes code from
 # the Jekyll project.
 
 module MudPie
@@ -60,8 +60,8 @@ module MudPie
       date.xmlschema
     end
 
-    def xml_escape(input)
-      CGI.escapeHTML(input)
+    def date_to_http_format(date)
+      date.strftime('%a, %d %b %Y %H:%M:%S %Z')
     end
 
     # CGI escape a string for use in a URL. Replaces any special characters
@@ -81,6 +81,18 @@ module MudPie
 
     def uri_escape(input)
       URI.escape(input)
+    end
+
+    def xml_escape(input)
+      CGI.escapeHTML(input)
+    end
+
+    def strip_html(input)
+      input.gsub(%r{</?[^>]+?>}, '')
+    end
+
+    def comma_separated(array)
+      array.join(', ')
     end
 
     # Count the number of words in the input string.
