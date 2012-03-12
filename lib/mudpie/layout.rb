@@ -12,19 +12,18 @@ class Layout < SourceFile
     @template ||= Liquid::Template.parse raw_content
   end
 
-  def render(content, page)
+  def render(context)
     puts "  Embedding in #{@path}"
-    output = begin
-      context = { 'site' => @site, 'page' => page, 'content' => content }
+    content = begin
       template.render! context, { :filters => [MudPie::Filters] }
     rescue => e
       puts "Liquid Exception: #{e.message} in layout #{@path}"
       puts "  " + e.backtrace.join("\n  ")
     end
     if layout then
-      layout.render output, page
+      layout.render context.merge('content' => content)
     else
-      output
+      content
     end
   end
 

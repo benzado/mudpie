@@ -69,7 +69,7 @@ class Page < SourceFile
       content = format_proc.call self, content
       # Step 3: render layout (optional)
       if embed_in_layout && layout then
-        layout.render content, self
+        layout.render context.merge('content' => content)
       else
         content
       end
