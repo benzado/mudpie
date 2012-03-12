@@ -141,7 +141,7 @@ class Site
       dst_path = File.join(dst_root, item.url)
       # If you are planning to use RewriteRule or MultiViews to hide file
       # extensions in the URL, you will still want them on the file.
-      if (File.extname dst_path) == '' then
+      if File.extname(dst_path) == '' and File.basename(dst_path)[0] != '.' then
         dst_path << '.html'
       end
       if item.needs_render? dst_path then
