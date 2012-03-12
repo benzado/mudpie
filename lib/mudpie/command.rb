@@ -13,6 +13,7 @@ Commands:
   clean - deletes the index database and output directory
   serve hot - starts a local webserver that builds pages on demand
   serve cold - starts a local webserver pointed at the output directory
+  compress - creates gzipped versions of compressable files
   help - prints this help text
 
 END_HELP_TEXT
@@ -74,6 +75,13 @@ class Command
     site = Site.new(config)
     server = Server.new(site, temperature == 'hot')
     server.start
+  end
+
+  def do_compress
+    path = @argv.shift || '.'
+    config = Config.new(path)
+    compressor = Compressor.new(config)
+    compressor.compress_all
   end
 
 end

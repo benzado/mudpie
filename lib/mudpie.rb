@@ -16,6 +16,7 @@ end
 
 # equip the kitchen
 require 'mudpie/command'
+require 'mudpie/compressor'
 require 'mudpie/config'
 require 'mudpie/filters'
 require 'mudpie/formats'
