@@ -84,15 +84,11 @@ module MudPie
     end
 
     def xml_escape(input)
-      CGI.escapeHTML(input)
+      input.gsub(/[<&>]/) {|c| '&#x%x;' % c.ord }
     end
 
-    def strip_html(input)
-      input.gsub(%r{</?[^>]+?>}, '')
-    end
-
-    def comma_separated(array)
-      array.join(', ')
+    def parse_entities(input)
+      input.gsub(/&#(\d+);/) {|d| $1.to_i.chr(Encoding::UTF_8) }.gsub('&amp;','&')
     end
 
     # Count the number of words in the input string.
