@@ -28,6 +28,21 @@ module MudPie
       converter.convert(input)
     end
 
+    BYTE_SUFFIX = %w[bytes KB MB GB TB PB]
+
+    def size_in_bytes_to_string(bytes)
+      exponent = 0
+      while bytes > 1024 and exponent < BYTE_SUFFIX.length do
+        exponent += 1
+        bytes /= 1024.0
+      end
+      if exponent == 0 then
+        "%d bytes" % bytes
+      else
+        "%.1f %s" % [bytes, BYTE_SUFFIX[exponent]]
+      end
+    end
+
     # Format a date in short format e.g. "27 Jan 2011".
     #
     # date - the Time to format.
