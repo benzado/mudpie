@@ -136,7 +136,9 @@ class Site
   end
 
   def add_dependency(path)
-    @current_item.add_dependency(path)
+    if @current_item
+      @current_item.add_dependency(path)
+    end
   end
 
   def render_all
