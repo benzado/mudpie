@@ -24,15 +24,25 @@ class Page < SourceFile
     Formats[name || (File.extname @path)]
   end
 
+  def add_dependency(path)
+    @site.index.add_dependency(@entry.id, path)
+  end
+
+  def dependencies
+    [ @path ] + @site.index.dependencies(@entry.id)
+  end
+
   def needs_render?(dst_path)
     if File.exists? dst_path then
-      (File.mtime @path) > (File.mtime dst_path)
+      dst_time = File.mtime dst_path
+      dependencies.any? { |dep_path| File.mtime(dep_path) > dst_time }
     else
       true
     end
   end
 
   def render_to(dst_path)
+    @site.index.clear_dependencies(@entry.id)
     if ymf_len == 0 then
       # File has no YMF, so just do a straight copy.
       puts "Copying #{dst_path}"
@@ -48,7 +58,8 @@ class Page < SourceFile
       File.open(dst_path, 'w') do |f|
         f.write content
       end
-      File.utime(@entry.mtime, @entry.mtime, dst_path)
+      newtime = dependencies.map{ |p| File.mtime p }.max
+      File.utime(newtime, newtime, dst_path)
     end
   end
 

@@ -42,7 +42,7 @@ class Site
         index_dir path
       else
         # if we don't ensure UTF-8, some strings might be saved as SQLite BLOBs
-        index_file path.encode('UTF-8')
+        index_file path.encode(Encoding::UTF_8)
       end
     end
   end
@@ -135,9 +135,14 @@ class Site
     end
   end
 
+  def add_dependency(path)
+    @current_item.add_dependency(path)
+  end
+
   def render_all
     dst_root = @config['destination']
     @index.each do |item|
+      @current_item = item
       dst_path = File.join(dst_root, item.url)
       # If you are planning to use RewriteRule or MultiViews to hide file
       # extensions in the URL, you will still want them on the file.
@@ -150,6 +155,7 @@ class Site
         item.render_to dst_path
       end
     end
+    @current_item = nil
   end
 
   # Handle Liquid Template access dynamically

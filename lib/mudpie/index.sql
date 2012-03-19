@@ -13,6 +13,12 @@ CREATE TABLE `metadata` (
   `file_id` INTEGER NOT NULL,
   `key` TEXT NOT NULL,
   `index` INTEGER,
-  `value` TEXT NOT NULL
+  `value` TEXT NOT NULL,
+  CONSTRAINT 'snowflake' UNIQUE (`file_id`,`key`,`index`) ON CONFLICT ABORT
 );
-CREATE UNIQUE INDEX `fko` ON `metadata` (`file_id`,`key`,`index`);
+
+CREATE TABLE `dependencies` (
+  `file_id` INTEGER NOT NULL,
+  `path` TEXT NOT NULL,
+  CONSTRAINT 'snowflake' UNIQUE (`file_id`,`path`) ON CONFLICT IGNORE
+);

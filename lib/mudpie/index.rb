@@ -17,7 +17,10 @@ class Index
     :insert_md => 'INSERT INTO `metadata` (`file_id`,`key`,`index`,`value`) VALUES (?,?,?,?)',
     :select_md_file_key => 'SELECT `index`,`value` FROM `metadata` WHERE `file_id` = ? AND `key` = ? ORDER BY `index`',
     :select_md_file => 'SELECT `key`,`index`,`value` FROM `metadata` WHERE `file_id` = ? ORDER BY `key`,`index`',
-    :select_md_values_for_key => 'SELECT `value` FROM metadata WHERE `key` = ? GROUP BY `value`'
+    :select_md_values_for_key => 'SELECT `value` FROM metadata WHERE `key` = ? GROUP BY `value`',
+    :insert_dependency => 'INSERT INTO `dependencies` (`file_id`,`path`) VALUES (?,?)',
+    :delete_dependencies => 'DELETE FROM `dependencies` WHERE `file_id` = ?',
+    :select_dependencies => 'SELECT `path` FROM `dependencies` WHERE `file_id` = ?'
   }
 
   def initialize(site)
@@ -90,6 +93,23 @@ class Index
         statement(:insert_md).execute!(file_id, key, nil, value)
       end
     end
+  end
+
+  def add_dependency(file_id, path)
+    # if we don't encode the path, it might get stored as a BLOB
+    statement(:insert_dependency).execute!(file_id, path.encode(Encoding::UTF_8))
+  end
+
+  def clear_dependencies(file_id)
+    statement(:delete_dependencies).execute!(file_id)
+  end
+
+  def dependencies(file_id)
+    paths = []
+    statement(:select_dependencies).execute!(file_id) do |row|
+      paths << row[0]
+    end
+    paths
   end
 
   def update_file(path)

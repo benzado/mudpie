@@ -13,6 +13,7 @@ class Layout < SourceFile
   end
 
   def render(context)
+    @site.add_dependency(@path)
     puts "  Embedding in #{@path}"
     content = begin
       template.render! context, { :filters => [MudPie::Filters] }

@@ -10,6 +10,7 @@ class IncludeTag < Liquid::Tag
   def render(context)
     site = context['site']
     path = File.join(site.config['includes_root'], @file)
+    site.add_dependency(path)
     # TODO: validate path, looking for illegal characters
     if File.exists? path then
       source = File.read path
