@@ -9,7 +9,8 @@ class Index
     :select_file_by_path => SELECT_FILES_SQL + ' WHERE `path` = ?',
     :select_file_by_url => SELECT_FILES_SQL + ' WHERE `url` = ?',
     :select_files_pages => SELECT_FILES_SQL + " WHERE `ymf_len` > 0 AND `path` NOT LIKE '~_%' ESCAPE '~'",
-    :select_files_posts => SELECT_FILES_SQL + " WHERE `collection_name` = 'posts' ORDER BY `date` DESC",
+    :select_files_posts_past => SELECT_FILES_SQL + " WHERE `collection_name` = 'posts' AND `date` < STRFTIME('%s','now') ORDER BY `date` DESC",
+    :select_files_posts_all => SELECT_FILES_SQL + " WHERE `collection_name` = 'posts' ORDER BY `date` DESC",
     :select_files_md_key_value => SELECT_FILES_SQL + ' JOIN metadata ON metadata.file_id = files.id WHERE `key` = ? AND `value` = ? ORDER BY `date` DESC',
     :insert_file => 'INSERT INTO `files` (`size`,`mtime`,`ymf_len`,`collection_name`,`url`,`date`,`path`) VALUES (?,?,?,?,?,?,?)',
     :update_file => 'UPDATE `files` SET `size` = ?,`mtime` = ?,`ymf_len` = ?,`collection_name`=?,`url`=?,`date`=? WHERE `path` = ?',
@@ -202,7 +203,12 @@ class Index
   end
 
   def all_posts
-    all statement(:select_files_posts)
+    which = if @site.config['hide_future_posts'] then
+      :select_files_posts_past
+    else
+      :select_files_posts_all
+    end
+    all statement(which)
   end
 
   def all_for_key_and_value(key, value)
