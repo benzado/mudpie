@@ -71,7 +71,7 @@ class Command
   def do_serve
     temperature = @argv.shift || 'hot'
     path = @argv.shift || '.'
-    config = Config.new(path)
+    config = Config.new(path, 'served' => temperature)
     site = Site.new(config)
     server = Server.new(site, temperature == 'hot')
     server.start

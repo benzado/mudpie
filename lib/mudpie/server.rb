@@ -8,6 +8,7 @@ class Server < WEBrick::HTTPServer
 
   def initialize(site, on_the_fly = true)
     @site = site
+    puts "SOME LIKE IT " + site['served'].upcase
     super(:Port => @site.config['server_port'])
     if on_the_fly then
       mount '/', HotServlet

@@ -11,10 +11,11 @@ class Config
     'index_path' => '_index.db',
     'layouts_root' => '_layouts',
     'permalink' => '/:categories/:year/:month/:day/:title.html',
-    'server_port' => 3000
+    'server_port' => 3000,
+    'served' => 'cold'
   }
 
-  def initialize(rel_path)
+  def initialize(rel_path, overrides = nil)
     # path may be a directory or a config file
     path = File.expand_path rel_path
     if File.directory? path then
@@ -31,6 +32,7 @@ class Config
       @STORE.merge!(YAML.parse_file(config_path).transform)
       @STORE['exclude'] << '.git'
     end
+    @STORE.merge!(overrides) if overrides
     Dir.chdir self['source']
     puts "Working from directory #{Dir.pwd}"
   end
