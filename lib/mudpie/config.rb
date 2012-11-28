@@ -5,7 +5,7 @@ class Config
   DEFAULTS = {
     'collections' => ['_posts'],
     'destination' => '_site',
-    'exclude' => ['.DS_Store', '.git', '.gitignore'],
+    'exclude' => ['.DS_Store', '.git', '.gitignore', 'Rakefile'],
     'hide_future_posts' => true,
     'includes_root' => '_includes',
     'index_path' => '_index.db',
