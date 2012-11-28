@@ -74,4 +74,19 @@ namespace :mp do
 
   task :serve => 'serve:hot'
 
+  desc "Set up a new site"
+  task :init => %w[.gitignore layouts pages parts site.rb]
+
+  %w[layouts pages parts].each do |dir|
+    file(dir) { |t| mkdir(t.name) }
+  end
+
+  file '.gitignore' do |t|
+    cp File.join(MudPie::GEM_ROOT, 'tmpl/gitignore'), t.name
+  end
+
+  file 'site.rb' do |t|
+    cp File.join(MudPie::GEM_ROOT, 'tmpl/site.rb'), t.name
+  end
+
 end
