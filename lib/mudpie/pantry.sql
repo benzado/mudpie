@@ -1,0 +1,14 @@
+CREATE TABLE `pages` (
+	`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`source_path` TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,
+	`url` TEXT NOT NULL,
+	`mtime` INTEGER NOT NULL
+);
+
+CREATE TABLE `meta` (
+	`page_id` INTEGER NOT NULL,
+	`key` TEXT NOT NULL,
+	`idx` INTEGER,
+	`value` TEXT NOT NULL,
+	CONSTRAINT 'snowflake' UNIQUE (`page_id`,`key`,`idx`) ON CONFLICT REPLACE
+);
