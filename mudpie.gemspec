@@ -1,3 +1,5 @@
+# http://guides.rubygems.org/specification-reference/
+
 Gem::Specification.new do |s|
   s.name = "mudpie"
   s.version = "2.0"
@@ -11,4 +13,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.files = `git ls-files`.split("\n")
   s.require_path = 'lib'
+  s.add_runtime_dependency 'rake', '~> 0.9.2'
+  s.add_runtime_dependency 'sqlite3', '~> 1.3.6'
+  s.add_runtime_dependency 'rdiscount', '~> 1.6.8'
 end
