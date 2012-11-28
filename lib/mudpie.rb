@@ -5,6 +5,7 @@ require 'rake/clean'
 
 module MudPie
   VERSION = '2.0'
+  GEM_ROOT = File.expand_path('..', File.dirname(__FILE__))
 end
 
 require 'mudpie/compressor'

@@ -17,7 +17,7 @@ class MudPie::Pantry
     @db = SQLite3::Database.new(DB_PATH)
     if is_new
       puts "Initializing pantry..."
-      schema_path = File.join(File.dirname(__FILE__), 'pantry.sql')
+      schema_path = File.join(MudPie::GEM_ROOT, 'rsrc/pantry.sql')
       @db.execute_batch(File.read(schema_path))
     end
     @stmts = Hash.new do |hsh, sql|
