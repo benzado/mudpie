@@ -51,20 +51,16 @@ namespace :mp do
     bakery.pantry
   end
 
-  desc "Render pages to output directory."
   task :bake => bakery.target_files
 
-  desc "Compress files in the output directory."
   task :compress => compressor.compressed_files
 
   namespace :serve do
 
-    desc "Start HTTP server in output directory."
     task :cold do
       MudPie::Server.new(bakery).start
     end
 
-    desc "Start HTTP server for live previews."
     task :hot do
       bakery.serve_hot!
       MudPie::Server.new(bakery).start
@@ -72,9 +68,6 @@ namespace :mp do
 
   end
 
-  task :serve => 'serve:hot'
-
-  desc "Set up a new site"
   task :init => %w[.gitignore layouts pages parts site.rb]
 
   %w[layouts pages parts].each do |dir|
@@ -88,5 +81,24 @@ namespace :mp do
   file 'site.rb' do |t|
     cp File.join(MudPie::GEM_ROOT, 'tmpl/site.rb'), t.name
   end
+
+end
+
+desc "Set up a new site"
+task :init => 'mp:init'
+
+desc "Render pages to `#{MudPie::Bakery::OUTPUT_ROOT}`"
+task :bake => 'mp:bake'
+
+desc "Compress files in `#{MudPie::Bakery::OUTPUT_ROOT}`"
+task :compress => 'mp:compress'
+
+namespace :serve do
+
+  desc "Start static HTTP server in `#{MudPie::Bakery::OUTPUT_ROOT}`"
+  task :cold => 'mp:serve:cold'
+
+  desc "Start dynamic HTTP server for live previews."
+  task :hot => 'mp:serve:hot'
 
 end
