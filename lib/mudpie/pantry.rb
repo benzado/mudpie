@@ -24,6 +24,7 @@ class MudPie::Pantry
       $stderr.puts "SQL: #{sql}"
       hsh[sql] = @db.prepare(SQL[sql] || sql)
     end
+    purge_rows_for_missing_files
   end
 
   def select_all(sql, *args)
@@ -33,6 +34,7 @@ class MudPie::Pantry
       @stmts[sql].columns.each_with_index do |column, i|
         hsh[column.to_sym] = row[i]
       end
+      yield hsh if block_given?
       results << hsh
     end
     return results
@@ -49,8 +51,24 @@ class MudPie::Pantry
     sql << ") VALUES ("
     sql << (['?'] * keys.count).join(',')
     sql << ")"
-    @stmts[sql].execute! *hsh.values_at(*keys)
+    @stmts[sql].execute!(*hsh.values_at(*keys))
     return @db.last_insert_row_id
+  end
+
+  def purge_rows_for_missing_files
+    ids_to_purge = []
+    select_all("SELECT `id`, `source_path` FROM `pages`") do |row|
+      path = row[:source_path]
+      unless File.exists?(path)
+        puts "Purging #{path}"
+        ids_to_purge << row[:id]
+      end
+    end
+    if ids_to_purge.count > 0
+      id_list = ids_to_purge.join(',')
+      @db.execute("DELETE FROM `pages` WHERE `id` IN (#{id_list})")
+      @db.execute("DELETE FROM `meta` WHERE `page_id` IN (#{id_list})")
+    end
   end
 
   def stock(page)
