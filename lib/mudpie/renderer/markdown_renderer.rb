@@ -1,8 +1,14 @@
-require 'rdiscount'
+require 'redcarpet'
 
 class MudPie::MarkdownRenderer < MudPie::Renderer
 
   HEADER_PATTERN = /^[\-\+\*]\s+(\w+):\s*(.+)\s*$/
+
+  class SmartyPantsHTML < Redcarpet::Render::HTML
+    include Redcarpet::Render::SmartyPants
+  end
+
+  MARKDOWN = Redcarpet::Markdown.new(SmartyPantsHTML)
 
   register '.md', self
 
@@ -18,9 +24,8 @@ class MudPie::MarkdownRenderer < MudPie::Renderer
       key, value = m[1].to_sym, m[2]
       context[key] = parse_value(value)
     end
-    r = RDiscount.new(source)
-    r.smart = true
-    output.write r.to_html
+    source.force_encoding(Encoding::UTF_8) if source.encoding == Encoding::ASCII_8BIT
+    output << MARKDOWN.render(source)
   end
 
   private
