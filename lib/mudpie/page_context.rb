@@ -77,6 +77,47 @@ class MudPie::PageContext
     DateTime.parse(date).httpdate
   end
 
+  def content_tag(tag_name, *args)
+    html = "<#{tag_name}"
+    if args.last.is_a?(Hash)
+      attributes = args.pop
+      attributes.each do |name, value|
+        html << sprintf(' %s="%s"', name, xml_escape(value.to_s))
+      end
+    end
+    content = if args.length > 0
+      args.join
+    elsif block_given?
+      yield
+    end
+    if content
+      html << sprintf('>%s</%s>', content, tag_name)
+    else
+      html << '/>'
+    end
+    return html
+  end
+
+  def asset_path(path)
+    if asset = @_bakery.sprockets_environment.find_asset(path)
+      File.join('/assets', asset.digest_path)
+    else
+      raise "Cannot find asset for path `#{path}`"
+    end
+  end
+
+  def stylesheet_asset_link(path)
+    content_tag :link, :href => asset_path(path), :rel => 'stylesheet'
+  end
+
+  def javascript_asset_link(path)
+    content_tag(:script, '', :src => asset_path(path), :type => 'text/javascript')
+  end
+
+  def meta_tag(property, content)
+    content_tag(:meta, :property => property, :content => content)
+  end
+
   # See https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
   NAMED_ENTITIES = {
     '&lsquo;' => "\u2018", '&rsquo;' => "\u2019",

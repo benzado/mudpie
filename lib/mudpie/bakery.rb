@@ -22,6 +22,19 @@ class MudPie::Bakery
     end
   end
 
+  def sprockets_environment
+    @sprockets ||= begin
+      env = Sprockets::Environment.new
+      env.append_path 'assets/javascripts'
+      env.append_path 'assets/stylesheets'
+      env
+    end
+  end
+
+  def sprockets_assets
+    %w( default.js default.css )
+  end
+
   def pantry
     unless @pantry
       @pantry = MudPie::Pantry.new(self)
