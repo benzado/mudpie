@@ -1,6 +1,6 @@
 class MudPie::Renderer
 
-  RENDERERS = {}
+  RENDERERS = Hash.new
 
   def self.register(extname, renderer_class)
     RENDERERS[extname] = renderer_class.new
@@ -67,3 +67,8 @@ class MudPie::Renderer
   end
 
 end
+
+require 'mudpie/renderer/erb_renderer'
+require 'mudpie/renderer/markdown_renderer'
+require 'mudpie/renderer/ruby_renderer'
+require 'mudpie/renderer/wpxml_renderer'

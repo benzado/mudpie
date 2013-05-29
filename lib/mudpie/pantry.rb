@@ -2,30 +2,36 @@ require 'sqlite3'
 
 class MudPie::Pantry
 
-  DB_PATH = 'cache/pantry.sqlite'
+  DB_PATH = Pathname.new('cache/pantry.sqlite')
 
   SQL = {
     :select_page_by_source_path => "SELECT * FROM `pages` WHERE `source_path` = ? LIMIT 1",
-    :select_page_by_url => "SELECT `source_path` FROM `pages` WHERE `url` = ? LIMIT 1",
-    :delete_meta_by_page_id => "DELETE `meta` WHERE `page_id` = ?"
+    :select_page_by_url => "SELECT * FROM `pages` WHERE `url` = ? LIMIT 1",
+    :select_meta_by_page_id => "SELECT * FROM `meta` WHERE `page_id` = ? ORDER BY `idx`",
+    :delete_meta_by_page_id => "DELETE FROM `meta` WHERE `page_id` = ?",
+    :update_mtime_by_page_id => "UPDATE `pages` SET `mtime` = ? WHERE `id` = ?"
   }
+
+  attr_reader :bakery
 
   def initialize(bakery)
     @bakery = bakery
-    is_new = !File.exists?(DB_PATH)
-    FileUtils.mkpath(File.dirname(DB_PATH)) if is_new
-    @db = SQLite3::Database.new(DB_PATH)
+    is_new = !DB_PATH.exist?
+    DB_PATH.dirname.mkpath if is_new
+    @db = SQLite3::Database.new(DB_PATH.to_s)
     if is_new
       puts "Initializing pantry..."
       schema_path = File.join(MudPie::GEM_ROOT, 'rsrc/pantry.sql')
       @db.execute_batch(File.read(schema_path))
     end
     @stmts = Hash.new do |hsh, sql|
-      $stderr.puts "SQL: #{sql}"
+      $stderr.puts "SQL: #{sql}" if MudPie::OPTIONS[:debug]
       hsh[sql] = @db.prepare(SQL[sql] || sql)
     end
-    purge_rows_for_missing_files
+    # purge_rows_for_missing_files
   end
+
+  # Basic Database Operations
 
   def select_all(sql, *args)
     results = []
@@ -41,7 +47,12 @@ class MudPie::Pantry
   end
 
   def select(sql, *args)
-    select_all(sql, *args).first
+    row = select_all(sql, *args).first
+    if block_given?
+      yield row if row
+    else
+      row
+    end
   end
 
   def insert(table, hsh)
@@ -55,57 +66,117 @@ class MudPie::Pantry
     return @db.last_insert_row_id
   end
 
-  def purge_rows_for_missing_files
-    ids_to_purge = []
-    select_all("SELECT `id`, `source_path` FROM `pages`") do |row|
-      path = row[:source_path]
-      unless File.exists?(path)
-        puts "Purging #{path}"
-        ids_to_purge << row[:id]
-      end
-    end
-    if ids_to_purge.count > 0
-      id_list = ids_to_purge.join(',')
-      @db.execute("DELETE FROM `pages` WHERE `id` IN (#{id_list})")
-      @db.execute("DELETE FROM `meta` WHERE `page_id` IN (#{id_list})")
+  # Database Helpers
+
+  def select_all_pages
+    # be sure to exclude layouts
+    select_all("SELECT * FROM `pages` WHERE `url` LIKE '/%'") do |row|
+      yield MudPie::Page.new(self, row)
     end
   end
 
-  def stock(page)
-    file_mtime = File.mtime(page.source_path).to_i
-    record = select(:select_page_by_source_path, page.source_path)
-    if record
-      return if file_mtime >= record[:mtime]
-      @stmts[:delete_meta_by_page_id].execute!(record[:id])
+  def layout_for_name(name)
+    select(:select_page_by_url, "##{name}") do |row|
+      MudPie::Page.new(self, row)
     end
-    puts "Stocking #{page.source_path}"
+  end
+
+  def delete_pages_by_id(ids_to_purge)
+    id_list = ids_to_purge.join(',')
+    @db.execute("DELETE FROM `pages` WHERE `id` IN (#{id_list})")
+    @db.execute("DELETE FROM `meta` WHERE `page_id` IN (#{id_list})")
+  end
+
+  def record_for_path(path)
+    select(:select_page_by_source_path, path.to_s) do |row|
+      { :id => row[:id].to_i, :mtime => Time.at(row[:mtime]) }
+    end
+  end
+
+  def page_id_for_source_path(path)
+    select(:select_page_by_source_path, path.to_s) { |row| row[:id].to_i }
+  end
+
+  def insert_page(source_path, mtime, url)
+    insert :pages, source_path: source_path.to_s, mtime: mtime, url: url
+  end
+
+  def insertable_value(value)
+    case value
+    when String, Numeric, NilClass
+      [value, nil]
+    when Symbol
+      [value.to_s, 'Symbol']
+    when TrueClass
+      [1, 'Boolean']
+    when FalseClass
+      [nil, 'Boolean']
+    when Time
+      [value.to_i, 'Time']
+    else
+      raise "Cannot store <#{value.class}:#{value}> in pantry!"
+    end
+  end
+
+  def insert_meta(page_id, key, value)
+    k = key.to_s
+    if value.is_a? Array
+      value.each_with_index do |element, i|
+        v, t = insertable_value(element)
+        insert :meta, page_id: page_id, key: k, idx: i, value: v, type: t
+      end
+    else
+      v, t = insertable_value(value)
+      insert :meta, page_id: page_id, key: k, value: v, type: t
+    end
+  end
+
+  # High-Level Operations
+
+  def stock(source_path, url, meta)
     @is_stocking = true
     @db.transaction do
-      page_id = insert(:pages, {
-        :source_path => page.source_path,
-        :mtime => file_mtime,
-        :url => page.url
-      })
-      page.meta.each do |key, value|
-        if value.is_a?(Array)
-          value.each_with_index do |v,i|
-            insert(:meta, {
-              :page_id => page_id,
-              :key => key.to_s,
-              :idx => i,
-              :value => v.to_s
-            })
-          end
-        else
-          insert(:meta, {
-            :page_id => page_id,
-            :key => key.to_s,
-            :value => (value.is_a?(Numeric) ? value : value.to_s)
-          })
-        end
+      page_id = page_id_for_source_path(source_path)
+      if page_id
+        @stmts[:delete_meta_by_page_id].execute!(page_id)
+        @stmts[:update_mtime_by_page_id].execute!(source_path.mtime.to_i, page_id)
+      else
+        page_id = insert_page(source_path.to_s, source_path.mtime.to_i, url)
+      end
+      meta.each do |key, value|
+        insert_meta(page_id, key, value)
       end
     end
+  ensure
     @is_stocking = false
+  end
+
+  def load_meta_for_page_id(context, page_id, allow_overwrites = false)
+    select_all(:select_meta_by_page_id, page_id) do |row|
+      begin
+        value = case row[:type]
+        when 'Symbol' then row[:value].to_sym
+        when 'Boolean' then row[:value] != nil
+        when 'Time' then Time.at(row[:value].to_i)
+        when nil then row[:value]
+        else raise "Pantry contains unknown type '#{row[:type]}'"
+        end
+      rescue TypeError => e
+        raise "#{e.message}: #{row.inspect}"
+      end
+      key = row[:key]
+      idx = row[:idx]
+      if idx.nil?
+        raise "Cannot overwrite #{key}" unless context[key].nil? || allow_overwrites
+        context[key] = value
+      elsif idx == 0
+        raise "Cannot overwrite #{key}" unless context[key].nil? || allow_overwrites
+        context[key] = [value]
+      else
+        raise "Problem 2" if context[key].length != idx
+        context[key] << value
+      end
+    end
   end
 
   def pages
@@ -114,7 +185,7 @@ class MudPie::Pantry
 
   def execute_page_query(query)
     raise "Can't execute page query inside metadata." if @is_stocking
-    sql = "SELECT `pages`.`source_path`"
+    sql = "SELECT `pages`.*"
     query.keys.each do |key|
       sql << ",`t_#{key}`.`value` AS `#{key}`"
     end
@@ -126,8 +197,8 @@ class MudPie::Pantry
     sql << where_sql
     sql << " GROUP BY `pages`.`source_path` "
     sql << query.order_sql
-    select_all(sql, *where_params).map do |hsh|
-      @bakery.page_for_path(hsh[:source_path]).meta
+    select_all(sql, *where_params).map do |row|
+      MudPie::Page.new(self, row).meta
     end
   end
 

@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../lib", File.dirname(__FILE__))
+require 'optparse'
+require 'mudpie'
+require 'mudpie/commands'
+
+module MudPie
+
+  begin
+    op = OptionParser.new do |opts|
+      opts.version = VERSION
+      opts.banner = "Usage: mudpie <command> [args...]"
+      opts.on('-d', '--debug', "Print lots of debugging output.") do |flag|
+        OPTIONS[:debug] = true
+      end
+      opts.on('-n', '--dry-run', "Don't create or modify any files.") do |flag|
+        OPTIONS[:dry_run] = true
+      end
+    end
+
+    begin
+      op.parse!
+      COMMANDS[ARGV.shift].call(ARGV, OPTIONS)
+    rescue => e
+      printf("Error:\n  %s\n", e.message)
+      puts '  ' + e.backtrace.join("\n  ") if OPTIONS[:debug]
+      puts op.help
+      puts 'Commands:'
+      COMMANDS.each do |name, cmd|
+        printf("  %-12s  %s\n", name, cmd.summary)
+      end
+    end
+
+  end
+
+end

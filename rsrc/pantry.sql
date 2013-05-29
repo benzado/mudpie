@@ -9,6 +9,7 @@ CREATE TABLE `meta` (
 	`page_id` INTEGER NOT NULL,
 	`key` TEXT NOT NULL,
 	`idx` INTEGER,
-	`value` TEXT NOT NULL,
+	`value` TEXT,
+	`type` TEXT,
 	CONSTRAINT 'snowflake' UNIQUE (`page_id`,`key`,`idx`) ON CONFLICT REPLACE
 );

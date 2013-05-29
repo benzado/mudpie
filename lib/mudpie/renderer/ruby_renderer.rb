@@ -12,10 +12,10 @@ class MudPie::RubyRenderer < MudPie::Renderer
   end
 
   def render(context, input, output)
-    tempout, $stdout = $stdout, output
-    filename = input.path if input.respond_to? :path
+    oldout, $stdout = $stdout, output
+    filename = input.respond_to?(:path) ? input.path : '(erb)'
     context.get_binding.eval(input.read, filename)
-    $stdout = tempout
+    $stdout = oldout
   end
 
   def load_template(path)

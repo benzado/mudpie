@@ -2,10 +2,9 @@ class MudPie::PageContext
 
   include Enumerable
 
-  PROTECTED_VARIABLES = [:@_bakery, :@_page]
+  PROTECTED_VARIABLES = [:@_page]
 
-  def initialize(bakery, page, hsh = nil)
-    @_bakery = bakery
+  def initialize(page, hsh = nil)
     @_page = page
     hsh.each { |key, value| self[key] = value } if hsh
   end
@@ -48,21 +47,21 @@ class MudPie::PageContext
   end
 
   def site
-    @_bakery.site
+    @_page.pantry.bakery.site
   end
 
   def served_hot?
-    @_bakery.serve_hot?
+    @_page.pantry.bakery.serve_hot?
   end
 
   def pages
-    @_bakery.pantry.pages
+    @_page.pantry.pages
   end
 
   # TODO: move these helpers into another class/module
 
   def absolute_url(path)
-    File.join(@_bakery.site.base_url, path).sub(%r{/index.html$}, '/')
+    File.join(@_page.pantry.bakery.site.base_url, path).sub(%r{/index.html$}, '/')
   end
 
   def xml_escape(input)
@@ -99,7 +98,7 @@ class MudPie::PageContext
   end
 
   def asset_path(path)
-    if asset = @_bakery.sprockets_environment.find_asset(path)
+    if asset = @_page.pantry.bakery.sprockets_environment.find_asset(path)
       File.join('/assets', asset.digest_path)
     else
       raise "Cannot find asset for path `#{path}`"
