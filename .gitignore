@@ -1,2 +1,4 @@
 /pkg
 /doc/public
+/tmp
+/Gemfile.lock
