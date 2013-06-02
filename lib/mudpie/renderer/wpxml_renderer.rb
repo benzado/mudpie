@@ -2,7 +2,8 @@ require 'nokogiri'
 
 class MudPie::WPXMLRenderer < MudPie::Renderer
 
-  register '.wpxml', self
+  register '.wp-page', self
+  register '.wp-post', self
 
   def read_meta(context, input)
     parse_input(input) do |xml|

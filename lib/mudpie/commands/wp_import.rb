@@ -102,7 +102,8 @@ class MudPie::WordPressImporter
 
   def import_page_item(item)
     page_url = URI.parse item.xpath('link').text
-    path = pathname_for_url(page_url, '.wpxml')
+    extname = '.wp-' + item.xpath('wp:post_type').text
+    path = pathname_for_url(page_url, extname)
     page_doc = Nokogiri::XML::Document.new
     page_doc.root = item.clone
     create_or_update_path(path) do |f|
