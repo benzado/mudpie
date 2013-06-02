@@ -2,6 +2,12 @@ require 'sqlite3'
 
 class MudPie::Pantry
 
+  class DuplicateURLError < StandardError
+    def initialize(source_path, url)
+      super("CONFLICT: Cannot stock file '#{source_path}' because the URL it maps to ('#{url}') is already used by another file.")
+    end
+  end
+
   DB_PATH = Pathname.new('cache/pantry.sqlite')
 
   SQL = {
@@ -146,6 +152,12 @@ class MudPie::Pantry
       meta.each do |key, value|
         insert_meta(page_id, key, value)
       end
+    end
+  rescue SQLite3::ConstraintException => e
+    if e.message == 'column url is not unique'
+      raise DuplicateURLError.new(source_path, url)
+    else
+      raise e
     end
   ensure
     @is_stocking = false

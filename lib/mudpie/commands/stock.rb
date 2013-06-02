@@ -13,16 +13,16 @@ class MudPie::StockCommand
   def self.call(argv, options)
     self.new.execute
   end
-  
+
   def initialize(bakery = nil)
     @bakery = bakery || MudPie::Bakery.new
     @pantry = @bakery.pantry
   end
-  
+
   def execute
+    purge_rows_for_missing_files
     scan_pages(Pathname.new('layouts')) { |path| stock_layout path }
     scan_pages(Pathname.new('pages'))   { |path| stock_page path }
-    purge_rows_for_missing_files
   end
 
   def scan_pages(dir, &block)
