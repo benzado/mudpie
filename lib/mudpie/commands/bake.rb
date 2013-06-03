@@ -11,11 +11,11 @@ class MudPie::BakeCommand
   end
 
   def self.call(argv, options)
-    self.new.execute
+    self.new(MudPie::Bakery.new).execute
   end
 
-  def initialize
-    @bakery = MudPie::Bakery.new
+  def initialize(bakery)
+    @bakery = bakery
   end
 
   def execute

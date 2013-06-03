@@ -11,12 +11,11 @@ class MudPie::StockCommand
   end
 
   def self.call(argv, options)
-    self.new.execute
+    self.new(MudPie::Bakery.new).execute
   end
 
-  def initialize(bakery = nil)
-    @bakery = bakery || MudPie::Bakery.new
-    @pantry = @bakery.pantry
+  def initialize(bakery)
+    @pantry = bakery.pantry
   end
 
   def execute

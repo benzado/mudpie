@@ -13,6 +13,7 @@ end
 require 'mudpie/commands/stock'
 require 'mudpie/commands/bake'
 require 'mudpie/commands/compress'
+require 'mudpie/commands/serve'
 require 'mudpie/commands/s3_deploy'
 require 'mudpie/commands/wp_import'
 require 'mudpie/commands/help'

@@ -24,27 +24,24 @@ class Rake::MudPieTask < Rake::TaskLib
       t.assets      = @bakery.sprockets_assets
     end
     task :stock do
-      MudPie::StockCommand.new.execute
+      MudPie::StockCommand.new(@bakery).execute
     end
     desc "Render pages to `#{@bakery.output_root}`"
     task :bake => [:stock, :assets] do
-      MudPie::BakeCommand.new.execute
+      MudPie::BakeCommand.new(@bakery).execute
     end
     desc "Compress files in `#{@bakery.output_root}`"
     task :compress do
       MudPie::CompressCommand.new(@bakery).execute
     end
     namespace :serve do
-      %w[INT TERM HUP].each do |signal|
-        trap(signal) { Rack::Handler::WEBrick.shutdown }
-      end
       desc "Start static HTTP server in `#{@bakery.output_root}`"
       task :cold do
-        Rack::Handler.default.run Rack::MudPie::cold_app(@bakery)
+        MudPie::ServeCommand.new(@bakery, :how => :cold).execute
       end
       desc "Start dynamic HTTP server for live previews."
       task :hot do
-        Rack::Handler.default.run Rack::MudPie::hot_app(@bakery)
+        MudPie::ServeCommand.new(@bakery, :how => :hot).execute
       end
     end
   end

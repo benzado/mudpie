@@ -14,7 +14,7 @@ class MudPie::S3DeployCommand
   end
 
   def self.call(argv, options)
-    self.new.execute
+    self.new(MudPie::Bakery.new).execute
   end
 
   def self.list_bucket(bucket_name)
@@ -108,11 +108,11 @@ class MudPie::S3DeployCommand
 
   end
 
-  def initialize
+  def initialize(bakery)
     config = YAML.load(File.read('aws.yml'))
     AWS.config(config)
     @bucket_name = config['bucket_name']
-    @bakery = MudPie::Bakery.new
+    @bakery = bakery
     if MudPie::OPTIONS[:debug]
       $stderr.puts "S3 Access Key ID: #{config['access_key_id']}"
       $stderr.puts "S3 Bucket: #{@bucket_name}"

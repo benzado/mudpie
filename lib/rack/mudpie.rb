@@ -10,6 +10,8 @@ module Rack::MudPie
       http_cache_control: 'Cache-Control'
     }
 
+    INDEX_NAME = 'index.html'
+
     def initialize(app, bakery)
       @app = app
       @bakery = bakery
@@ -19,12 +21,13 @@ module Rack::MudPie
     def call(env)
       request = Rack::Request.new(env)
       path = request.path
-      page = if path[-1] == '/'
-        @bakery.page_for_url(path + 'index.html')
-      else
-        @bakery.page_for_url(path)
+      if path[-1] == '/'
+        path << INDEX_NAME
+        puts "Appending '#{INDEX_NAME} to request."
       end
+      page = @bakery.page_for_url(path)
       if page.nil? or page.static?
+        env['PATH_INFO'] = path # in case we re-wrote it
         @app.call(env)
       else
         @stock.execute
@@ -56,7 +59,7 @@ module Rack::MudPie
   end
 
   def self.cold_app(bakery)
-    Rack::Static.new(nil, urls: [""], root: 'public', index: 'index.html')
+    Rack::Static.new(nil, urls: [""], root: 'public', index: INDEX_NAME)
   end
 
 end

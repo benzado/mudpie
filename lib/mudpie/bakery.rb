@@ -26,9 +26,7 @@ class MudPie::Bakery
   end
 
   def page_for_url(url)
-    pantry.select(:select_page_by_url, url) do |row|
-      MudPie::Page.new(@pantry, row)
-    end
+    pantry.page_for_url(url)
   end
 
   def site

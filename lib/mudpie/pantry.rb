@@ -127,6 +127,12 @@ class MudPie::Pantry
     end
   end
 
+  def page_for_url(url)
+    select("SELECT * FROM `pages` WHERE `url` = ?", url) do |row|
+      MudPie::Page.new(self, row)
+    end
+  end
+
   def layout_for_name(name)
     select("SELECT * FROM `pages` WHERE `url` = ? LIMIT 1", "##{name}") do |row|
       MudPie::Page.new(self, row)
