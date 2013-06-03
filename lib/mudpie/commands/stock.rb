@@ -30,11 +30,11 @@ class MudPie::StockCommand
       if path.directory?
         scan_pages(path, &block)
       else
-        record = @pantry.record_for_path(path)
-        if record.nil?
+        mtime = @pantry.mtime_for_path(path)
+        if mtime.nil?
           puts "NEW  #{path}"
           yield path
-        elsif record[:mtime] < path.mtime
+        elsif mtime < path.mtime
           puts "UPDA #{path}"
           yield path
         else
@@ -57,11 +57,10 @@ class MudPie::StockCommand
 
   def purge_rows_for_missing_files
     ids_to_purge = []
-    @pantry.select_all("SELECT * FROM `pages`") do |row|
-      path = Pathname.new(row[:source_path])
+    @pantry.each_path do |path, page_id|
       unless path.exist?
         puts "DELE #{path}"
-        ids_to_purge << row[:id]
+        ids_to_purge << page_id
       end
     end
     if ids_to_purge.length > 0

@@ -19,7 +19,7 @@ class MudPie::BakeCommand
   end
 
   def execute
-    @bakery.pantry.select_all_pages do |page|
+    @bakery.pantry.each_page do |page|
       target_path = Pathname.new('public' + page.url)
       # TODO: check dependencies (layouts), too
       if !target_path.exist? || page.mtime > target_path.mtime
