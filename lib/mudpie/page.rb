@@ -30,15 +30,15 @@ module MudPie
     end
 
     def each_layout
-      if layout_name = meta[:layout]
-        while layout_name
-          layout = @pantry.layout_for_name(layout_name)
-          raise "Can't find layout '#{layout_name}'" if layout.nil?
-          yield layout
-          layout_name = layout.meta[:layout]
+      layout_name = meta[:layout] || default_layout_name
+      while layout_name
+        layout = @pantry.layout_for_name(layout_name)
+        if layout.nil?
+          return if layout_name == default_layout_name
+          raise "Can't find layout '#{layout_name}'"
         end
-      elsif layout = @pantry.layout_for_name(default_layout_name)
         yield layout
+        layout_name = layout.meta[:layout]
       end
     end
 

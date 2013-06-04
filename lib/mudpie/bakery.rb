@@ -22,7 +22,16 @@ class MudPie::Bakery
   end
 
   def sprockets_assets
-    %w( default.js default.css )
+    assets = Array.new
+    %w( assets/javascripts assets/stylesheets ).each do |dir|
+      Pathname.new(dir).each_child do |asset|
+        if asset.file?
+          $stderr.puts "ASSET #{asset.basename}" if MudPie::OPTIONS[:debug]
+          assets << asset.basename
+        end
+      end
+    end
+    assets
   end
 
   def page_for_url(url)

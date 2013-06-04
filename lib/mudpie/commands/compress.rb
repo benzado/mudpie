@@ -24,15 +24,23 @@ class MudPie::CompressCommand
   end
 
   def execute
-    @bakery.pantry.select_all_pages do |page|
+    @bakery.pantry.each_page do |page|
       path = Pathname.new(@bakery.output_root + page.url)
-      path_gz = Pathname.new(@bakery.output_root + page.url + '.gz')
-      if (!path_gz.exist? || path.mtime > path_gz.mtime) && compressable?(page)
-        puts "GZIP #{page.url}"
-        compress(path, path_gz)
-      else
-        puts "OK   #{page.url}" if MudPie::OPTIONS[:debug]
+      outdated(path) do |path_gz|
+        compress path, path_gz if compressable? page
       end
+    end
+    Pathname.new(@bakery.output_root).join('assets').each_child do |path|
+      outdated(path) do |path_gz|
+        compress path, path_gz if COMPRESSABLE_EXTNAMES.include?(path.extname)
+      end
+    end
+  end
+
+  def outdated(path)
+    path_gz = Pathname.new(path.to_s + '.gz')
+    if (!path_gz.exist? || path.mtime > path_gz.mtime)
+      yield path_gz
     end
   end
 
@@ -44,6 +52,7 @@ class MudPie::CompressCommand
   end
 
   def compress(path, path_gz)
+    puts "GZIP #{path}"
     Zlib::GzipWriter.open(path_gz.to_s) do |gz|
       gz.mtime = path.mtime
       gz.orig_name = path.basename.to_s

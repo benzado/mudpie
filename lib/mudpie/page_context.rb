@@ -60,7 +60,7 @@ class MudPie::PageContext
 
   # TODO: move these helpers into another class/module
 
-  def absolute_url(path)
+  def absolute_url(path = @_page.url)
     File.join(@_page.pantry.bakery.site.base_url, path).sub(%r{/index.html$}, '/')
   end
 
@@ -115,6 +115,16 @@ class MudPie::PageContext
 
   def meta_tag(property, content)
     content_tag(:meta, :property => property, :content => content)
+  end
+
+  def link_to(subject, url = nil)
+    if subject.is_a? MudPie::PageContext
+      text = subject.title
+      url = subject.url if url.nil?
+    else
+      text = subject.to_s
+    end
+    content_tag(:a, text, href: url)
   end
 
   # See https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references

@@ -72,15 +72,22 @@ class MudPie::S3DeployCommand
 
     CONTENT_TYPES = {
       '.css'  => 'text/css; charset=UTF-8',
+      '.gif'  => 'image/gif',
       '.html' => 'text/html; charset=UTF-8',
       '.ico'  => 'image/x-icon',
       '.jpeg' => 'image/jpeg',
       '.jpg'  => 'image/jpeg',
-      '.js'   => 'text/javascript; charset=UTF-8',
-      '.json' => 'application/json; charset=UTF-8',
+      '.js'   => 'application/javascript',
+      '.json' => 'application/json',
+      '.pdf'  => 'application/pdf',
+      '.pl'   => 'text/plain; charset=UTF-8',
+      '.plist'=> 'application/x-plist',
       '.png'  => 'image/png',
+      '.rtf'  => 'text/rtf',
+      '.safariextz' => 'application/octet-stream',
       '.txt'  => 'text/plain; charset=UTF-8',
       '.xml'  => 'text/xml; charset=UTF-8',
+      '.zip'  => 'application/zip'
     }
 
     DEFAULT_CONTENT_TYPE = 'application/octet-stream'
@@ -122,7 +129,7 @@ class MudPie::S3DeployCommand
   def execute
     page_files = Hash.new
 
-    @bakery.pantry.select_all_pages do |page|
+    @bakery.pantry.each_page do |page|
       pf = PageFile.from_page(page)
       page_files[pf.key] = pf
     end

@@ -87,19 +87,20 @@ class MudPie::Pantry
 
   def execute_page_query(query)
     raise "Can't execute page query inside metadata section." if @is_stocking
-    sql = "SELECT `pages`.*"
+    sql = ["SELECT `pages`.*"]
     query.keys.each do |key|
       sql << ",`t_#{key}`.`value` AS `#{key}`"
     end
-    sql << " FROM `pages` "
+    sql << "FROM `pages`"
     query.keys.each do |key|
-      sql << "LEFT JOIN `meta` AS `t_#{key}` ON (`t_#{key}`.`page_id` = `pages`.`id` AND `t_#{key}`.`key` = '#{key}') "
+      sql << "LEFT JOIN `meta` AS `t_#{key}` ON (`t_#{key}`.`page_id` = `pages`.`id` AND `t_#{key}`.`key` = '#{key}')"
     end
     where_sql, *where_params = query.where_sql
     sql << where_sql
-    sql << " GROUP BY `pages`.`source_path` "
+    sql << "GROUP BY `pages`.`source_path`"
     sql << query.order_sql
-    select_all(sql, *where_params).map do |row|
+    sql << query.limit_sql
+    select_all(sql.join(' '), *where_params).map do |row|
       MudPie::Page.new(self, row).meta
     end
   end
@@ -159,9 +160,13 @@ class MudPie::Pantry
     insert :pages, source_path: source_path.to_s, mtime: source_path.mtime.to_i, url: url
   end
 
-  def insertable_value(value)
+  def insertable_value(value, key)
     case value
-    when String, Numeric, NilClass
+    when String
+      # String encoding from .erb files may be ASCII-8BIT, which will be saved
+      # by SQLiteas a BLOB unless we intervene.
+      [value.encode(Encoding::UTF_8), nil]
+    when Numeric, NilClass
       [value, nil]
     when Symbol
       [value.to_s, 'Symbol']
@@ -180,11 +185,11 @@ class MudPie::Pantry
     k = key.to_s
     if value.is_a? Array
       value.each_with_index do |element, i|
-        v, t = insertable_value(element)
+        v, t = insertable_value(element, k)
         insert :meta, page_id: page_id, key: k, idx: i, value: v, type: t
       end
     else
-      v, t = insertable_value(value)
+      v, t = insertable_value(value, k)
       insert :meta, page_id: page_id, key: k, value: v, type: t
     end
   end

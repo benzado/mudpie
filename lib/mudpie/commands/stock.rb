@@ -30,7 +30,7 @@ class MudPie::StockCommand
         scan_pages(path, &block)
       else
         mtime = @pantry.mtime_for_path(path)
-        if mtime.nil?
+        if mtime.nil? and path.basename != '.DS_Store'
           puts "NEW  #{path}"
           yield path
         elsif mtime < path.mtime

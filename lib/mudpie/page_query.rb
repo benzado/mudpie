@@ -31,14 +31,13 @@ class MudPie::PageQuery
     end
   end
 
-  def initialize(pantry, where = [], order = [])
+  def initialize(pantry, state = nil)
     @pantry = pantry
-    @where = where.freeze
-    @order = order.freeze
+    @state = state || { where: [], order: [], limit: nil }
   end
 
   def where(*args)
-    new_where = @where.dup
+    new_where = @state[:where].dup
     case args.length
     when 0
       raise "Where what?"
@@ -64,11 +63,11 @@ class MudPie::PageQuery
     else
       raise "Too many arguments, I don't know how to deal."
     end
-    self.class.new(@pantry, new_where, @order)
+    self.class.new(@pantry, @state.merge(where: new_where))
   end
 
   def order(*args)
-    new_order = @order.dup
+    new_order = @state[:order].dup
     args.map(&:to_s).each do |arg|
       if /^(\w+) (ASC|DESC)$/i.match(arg)
         new_order << SortDescriptor.new($1, $2.upcase == 'ASC')
@@ -78,7 +77,11 @@ class MudPie::PageQuery
         raise "I don't understand order by '#{arg}'"
       end
     end
-    self.class.new(@pantry, @where, new_order)
+    self.class.new(@pantry, @state.merge(order: new_order))
+  end
+
+  def limit(new_limit)
+    self.class.new(@pantry, @state.merge(limit: new_limit))
   end
 
   def all
@@ -86,7 +89,7 @@ class MudPie::PageQuery
   end
 
   def first
-    all.first
+    limit(1).all.first
   end
 
   def each(&block)
@@ -95,19 +98,27 @@ class MudPie::PageQuery
 
   def keys
     set = ::Set.new
-    set.merge @where.map(&:key)
-    set.merge @order.map(&:key)
+    set.merge @state[:where].map(&:key)
+    set.merge @state[:order].map(&:key)
   end
 
   def where_sql
-    return [""] if @where.size == 0
-    sql = @where.map(&:to_sql).join(' AND ')
-    ['WHERE ' + sql].concat(@where.map(&:value).compact)
+    predicates = @state[:where]
+    return [""] if predicates.size == 0
+    sql = predicates.map(&:to_sql).join(' AND ')
+    ['WHERE ' + sql].concat(predicates.map(&:value).compact)
   end
 
   def order_sql
-    return "" if @order.length == 0
-    "ORDER BY " + @order.map(&:to_sql).join(', ')
+    sort_descs = @state[:order]
+    return "" if sort_descs.length == 0
+    "ORDER BY " + sort_descs.map(&:to_sql).join(', ')
+  end
+
+  def limit_sql
+    limit = @state[:limit]
+    return "" if limit.nil?
+    "LIMIT #{limit}"
   end
 
 end

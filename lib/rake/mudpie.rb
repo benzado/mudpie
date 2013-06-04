@@ -7,7 +7,7 @@ module Rake::MudPie
     '.gitignore' => 'tmpl/gitignore',
     'site.rb' => 'tmpl/site.rb'
   }
-  DIRS = %w[ assets layouts pages parts public ]
+  DIRS = %w[ layouts pages parts ]
 end
 
 Rake::MudPie::FILES.each do |name, tmpl|

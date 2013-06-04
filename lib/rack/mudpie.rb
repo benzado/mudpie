@@ -25,12 +25,12 @@ module Rack::MudPie
         path << INDEX_NAME
         puts "Appending '#{INDEX_NAME} to request."
       end
+      @stock.execute
       page = @bakery.page_for_url(path)
       if page.nil? or page.static?
         env['PATH_INFO'] = path # in case we re-wrote it
         @app.call(env)
       else
-        @stock.execute
         response = Rack::Response.new
         response['X-Served-Hot-By'] = "MudPie/#{MudPie::VERSION}"
         HEADER_FOR_META_KEY.each do |key, header|

@@ -103,6 +103,7 @@ class MudPie::WordPressImporter
   def import_page_item(item)
     page_url = URI.parse item.xpath('link').text
     extname = '.wp-' + item.xpath('wp:post_type').text
+    return if extname == '.wp-nav_menu_item'
     path = pathname_for_url(page_url, extname)
     page_doc = Nokogiri::XML::Document.new
     page_doc.root = item.clone
