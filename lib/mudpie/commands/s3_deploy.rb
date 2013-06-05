@@ -104,9 +104,29 @@ class MudPie::S3DeployCommand
     end
 
     def update_needed?
-      @remote_etag.nil? ||
-      @pathname.size != @remote_size ||
-      @pathname.mtime > @remote_mtime
+      @remote_etag.nil? || size_mismatch? || content_mismatch?
+    end
+
+    def size_mismatch?
+      @pathname.size != @remote_size
+    end
+
+    def content_mismatch?
+      @remote_etag != local_etag
+    end
+
+    def local_etag
+      @local_etag ||= begin
+        digest = OpenSSL::Digest::MD5.new
+        buffer = String.new
+        @pathname.open('rb') do |f|
+          while not f.eof?
+            f.readpartial(1024, buffer)
+            digest << buffer
+          end
+        end
+        '"' + digest.digest.unpack('H*').first + '"'
+      end
     end
 
     def to_s
