@@ -25,6 +25,14 @@ class MudPie::StockCommand
   end
 
   def scan_pages(dir, &block)
+    unless dir.directory?
+      if dir.exist?
+        $stderr.puts "WARNING: '#{dir}' is not a directory."
+      else
+        $stderr.puts "WARNING: directory '#{dir}' does not exist."
+      end
+      return
+    end
     dir.each_child do |path|
       if path.directory?
         scan_pages(path, &block)
