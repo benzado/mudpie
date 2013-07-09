@@ -16,7 +16,7 @@ class MudPie::CompressCommand
     self.new(MudPie::Bakery.new).execute
   end
 
-  COMPRESSABLE_EXTNAMES = %w[.css .js .html .txt .xml]
+  COMPRESSABLE_EXTNAMES = %w[.css .js .html .txt]
   EXCLUDE_URLS = %w[/robots.txt]
 
   def initialize(bakery)
