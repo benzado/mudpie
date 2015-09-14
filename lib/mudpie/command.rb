@@ -14,11 +14,11 @@ module MudPie
       def option_parser
         OptionParser.new do |opts|
           initialize_option_parser(opts)
-          opts.on('-d', '--[no-]debug', 'display debugging output') do |flag|
-            logger.debug = flag
+          opts.on('-d', '--debug', 'display debugging output') do
+            logger.level = MudPie::Logger::DEBUG
           end
-          opts.on('-q', '--[no-]quiet', 'generate no output') do |flag|
-            logger.quiet = flag
+          opts.on('-q', '--quiet', 'generate no output') do
+            logger.level = MudPie::Logger::WARN
           end
           opts.on_tail('-h', '--help', 'display this message') do
             puts opts

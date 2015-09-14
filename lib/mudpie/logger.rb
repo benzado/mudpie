@@ -8,31 +8,18 @@ module MudPie
     INFO  =  0
     DEBUG = -1
 
+    attr_accessor :output
+    attr_accessor :level
+
     def initialize
       @output = $stderr
-      @output_level = INFO
+      @level = INFO
     end
 
-    def quiet=(quiet)
-      if quiet
-        @output_level = WARN
-      else
-        @output_level = [INFO, @output_level].min
-      end
-    end
-
-    def debug=(debug)
-      if debug
-        @output_level = DEBUG
-      else
-        @output_level = [INFO, @output_level].max
-      end
-    end
-
-    def log(level, message)
-      if level >= @output_level
+    def log(message_level, message)
+      if message_level >= @level
         if @output.isatty
-          case level
+          case message_level
           when WARN then message = red(message)
           when DEBUG then message = faint(message)
           end
