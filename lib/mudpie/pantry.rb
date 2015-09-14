@@ -71,23 +71,10 @@ module MudPie
     end
 
     def resource_for_path(path)
-      select = @db.prepare('SELECT * FROM resources WHERE path GLOB ?')
-      # Enclosing special characters in square brackets instructs GLOB to
-      # treat them as regular characters to be matched.
-      escaped_path = path.gsub(/[\*\?\[\]]/) { |c| "[#{c}]" }
-      result_set = select.execute(escaped_path + '*')
-
-      first_hash = result_set.next_hash
-      return nil if first_hash.nil?
-
-      second_hash = result_set.next_hash
-      return Resource.new(first_hash) if second_hash.nil?
-
-      matched_resource_paths = [ first_hash['path'], second_hash['path'] ]
-      result_set.each_hash do |row_hash|
-        matched_resource_paths << row_hash['path']
-      end
-      raise "path #{path} is ambiguous, matches #{matched_resource_paths.count} resources: #{matched_resource_paths.inspect}"
+      select = @db.prepare('SELECT * FROM resources WHERE path = ?')
+      result_set = select.execute(path)
+      row = result_set.next_hash
+      Resource.new(row) unless row.nil?
     end
   end
 end
