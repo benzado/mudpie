@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../lib", File.dirname(__FILE__))
+require 'mudpie/command/prep'
+
+MudPie::Command::Prep.new(ARGV).run

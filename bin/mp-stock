@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../lib", File.dirname(__FILE__))
+require 'mudpie/command/stock'
+
+MudPie::Command::Stock.new(ARGV).run
