@@ -6,7 +6,7 @@ module MudPie::Loader
 
     def load_resource
       MudPie::Resource.new(
-        'path'          => source_path.to_s,
+        'path'          => path,
         'renderer'      => 'default',
         'metadata_yaml' => nil,
         'content'       => source_path.read

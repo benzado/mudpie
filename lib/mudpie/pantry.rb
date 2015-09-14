@@ -4,7 +4,7 @@ require 'mudpie/resource'
 
 module MudPie
   class Pantry
-    def initialize(config)
+    def initialize(config = MudPie.config)
       @config = config
       open_or_create
     end

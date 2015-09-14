@@ -1,3 +1,5 @@
+require 'mudpie/renderer'
+
 module MudPie
   class Resource
     def initialize(row)

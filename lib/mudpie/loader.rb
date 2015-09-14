@@ -7,6 +7,11 @@ module MudPie::Loader
     def initialize(source_path)
       @source_path = source_path
     end
+
+    def path
+      source_root = Pathname.new(MudPie.config.path_to_source)
+      '/' + source_path.relative_path_from(source_root).to_s
+    end
   end
 
   def self.add_loader_class(loader_class)

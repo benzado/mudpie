@@ -11,6 +11,14 @@ module MudPie
       normalize_layout_value
     end
 
+    def content_type
+      @metadata['content_type'] || 'application/octet-stream'
+    end
+
+    def content_type=(mime_type)
+      @metadata['content_type'] = mime_type
+    end
+
     def normalize_layout_value
       layout = @metadata['layout']
       MudPie.logger.debug "normalizing layout value: #{layout.inspect}"

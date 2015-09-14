@@ -11,7 +11,7 @@ module MudPie::Loader
     end
 
     def path
-      source_path.to_s.chomp(source_path.extname)
+      super.chomp(source_path.extname)
     end
 
     def renderer
