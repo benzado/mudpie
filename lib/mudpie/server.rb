@@ -1,4 +1,5 @@
 require 'mudpie/pantry'
+require 'mudpie/execution_context'
 
 module MudPie
   class Server
@@ -24,6 +25,7 @@ module MudPie
         response['X-Served-Hot-By'] = "MudPie/#{MudPie::VERSION}"
         if request.get?
           context = RenderContext.new
+          context.metadata[ExecutionContext::SERVED_HOT_KEY] = true
           resource.renderer.render_to(response, context)
           response['Content-Type'] = context.content_type!
         end
