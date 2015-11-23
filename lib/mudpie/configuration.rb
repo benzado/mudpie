@@ -13,7 +13,7 @@ module MudPie
     }
 
     def initialize(path = nil)
-      @config = Psych.load_file(path || 'pie.yml') || Hash.new
+      @config = Psych.load_file(path || 'mudpie.yml') || Hash.new
     end
 
     def content_type_for_extname(extname)

@@ -16,7 +16,7 @@ module MudPie::Command
         create_directory(root + '.mudpie')
         create_directory(root + 'source')
         create_directory(root + 'layout')
-        create_file(root + 'pie.yml')
+        create_file(root + 'mudpie.yml')
       end
     end
 
