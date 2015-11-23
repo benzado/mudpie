@@ -45,5 +45,8 @@ module MudPie
     def content_length
       content.length rescue 0
     end
+
+    # Allow a resource to be used as a Pathname
+    alias_method :read, :content
   end
 end

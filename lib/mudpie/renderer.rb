@@ -47,9 +47,9 @@ module MudPie::Renderer
 end
 
 require 'mudpie/renderer/default'
+require 'mudpie/renderer/erb'
 require 'mudpie/renderer/markdown'
 # require 'mudpie/renderer/textile'
-# require 'mudpie/renderer/erb'
 # require 'mudpie/renderer/ruby'
 # require 'mudpie/renderer/shell_script'
 # require 'mudpie/renderer/wordpress'

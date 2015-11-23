@@ -1,6 +1,7 @@
 module MudPie::Loader
   class FrontMatter < BasicLoader
     RENDERER_FOR_TYPE = {
+      '.erb'      => 'erb',
       '.markdown' => 'markdown',
       '.md'       => 'markdown',
       '.textile'  => 'textile',
