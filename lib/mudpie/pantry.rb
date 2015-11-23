@@ -1,5 +1,4 @@
 require 'sqlite3'
-require 'mudpie/loader'
 require 'mudpie/resource'
 
 module MudPie
@@ -49,13 +48,12 @@ module MudPie
       }
     end
 
-    def stock(path)
-      resource = MudPie::Loader.loader_for_path(path).load_resource
+    def stock_resource_from_source(resource, source)
       resources_insert.execute(
         path: resource.path,
         stocked_at: Time.now.to_i,
-        modified_at: path.mtime.to_i,
-        source_length: path.size,
+        modified_at: source.mtime.to_i,
+        source_length: source.size,
         renderer: resource.renderer_name,
         metadata_yaml: (resource.metadata_yaml.to_blob rescue nil),
         content: (resource.content.to_blob rescue nil)
@@ -72,8 +70,10 @@ module MudPie
 
     def resource_for_path(path)
       select = @db.prepare('SELECT * FROM resources WHERE path = ?')
-      result_set = select.execute(path)
-      row = result_set.next_hash
+      # I don't know why, but this query fails when the path is encoded as
+      # ASCII_8BIT even when all the strings involved are ASCII-compatible.
+      results = select.execute(path.encode(Encoding::UTF_8))
+      row = results.next_hash
       Resource.new(row) unless row.nil?
     end
   end

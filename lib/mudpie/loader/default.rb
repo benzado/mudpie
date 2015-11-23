@@ -1,7 +1,7 @@
 module MudPie::Loader
   class Default < BasicLoader
     def self.can_load_path?(path)
-      true # come at me, bro
+      path.file?
     end
 
     def load_resource

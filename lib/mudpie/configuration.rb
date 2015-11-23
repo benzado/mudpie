@@ -37,6 +37,10 @@ module MudPie
     def path_to_source
       @config['source_path'] || 'source'
     end
+
+    def ignore_source_path?(path)
+      path.fnmatch('**/.DS_Store')
+    end
   end
 
   def self.config

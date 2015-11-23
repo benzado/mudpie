@@ -20,7 +20,7 @@ module MudPie::Loader
 
   def self.loader_for_path(path)
     loader_class = LOADER_CLASSES.find { |lc| lc.can_load_path?(path) }
-    loader_class.new(path)
+    loader_class && loader_class.new(path)
   end
 end
 

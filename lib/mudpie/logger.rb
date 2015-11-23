@@ -28,6 +28,11 @@ module MudPie
       end
     end
 
+    def fatal(message)
+      log(WARN, message)
+      exit(1)
+    end
+
     def warn(message)
       log(WARN, message)
     end

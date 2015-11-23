@@ -19,7 +19,7 @@ module MudPie
       if resource.nil?
         response['Content-Type'] = 'text/plain'
         response.status = 404
-        response.write "MudPie says: no known resource at #{path}."
+        response.write "MudPie says: no known resource at #{path}.\r\n"
       else
         response['X-Served-Hot-By'] = "MudPie/#{MudPie::VERSION}"
         if request.get?
