@@ -25,7 +25,7 @@ module MudPie
         if request.get?
           context = RenderContext.new
           resource.renderer.render_to(response, context)
-          response['Content-Type'] = context.content_type
+          response['Content-Type'] = context.content_type!
         end
       end
       response.finish

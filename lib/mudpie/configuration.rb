@@ -3,13 +3,16 @@ require 'psych'
 module MudPie
   class Configuration
     CONTENT_TYPE_FOR_EXT = {
+      '.css'  => 'text/css',
       '.gif'  => 'image/gif',
       '.html' => 'text/html',
       '.jpeg' => 'image/jpeg',
       '.jpg'  => 'image/jpeg',
+      '.js'   => 'application/javascript', # old IE needs text/javascript
       '.png'  => 'image/png',
       '.text' => 'text/plain',
       '.txt'  => 'text/plain',
+      '.xml'  => 'application/xml',
     }
 
     def initialize(path = nil)
@@ -17,7 +20,10 @@ module MudPie
     end
 
     def content_type_for_extname(extname)
-      CONTENT_TYPE_FOR_EXT[extname]
+      CONTENT_TYPE_FOR_EXT[extname] || begin
+        MudPie.logger.warn "No Content-Type defined for #{extname}"
+        'application/octet-stream'
+      end
     end
 
     def index_name

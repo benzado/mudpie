@@ -11,8 +11,12 @@ module MudPie
       normalize_layout_value
     end
 
+    def content_type!
+      content_type or raise 'content_type undefined!'
+    end
+
     def content_type
-      @metadata['content_type'] || 'application/octet-stream'
+      @metadata['content_type']
     end
 
     def content_type=(mime_type)
@@ -31,6 +35,8 @@ module MudPie
         else
           @metadata['layout'] = []
         end
+      when NilClass
+        @metadata['layout'] = []
       else
         MudPie.logger.warn "ignoring unsupported layout value: #{layout.inspect}"
         @metadata['layout'] = []

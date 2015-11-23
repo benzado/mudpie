@@ -5,7 +5,7 @@ module MudPie::Renderer
     end
 
     def rendered_content(context)
-      context.content_type = content_type || 'application/octet-stream'
+      context.content_type = content_type
       resource.content
     end
   end
