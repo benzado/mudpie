@@ -24,8 +24,7 @@ module MudPie::Renderer
       raise "rendered_content not implemented by #{self.class.name}"
     end
 
-    def render_to(output, context = nil)
-      context ||= MudPie::RenderContext.new
+    def render_to(output, context)
       # TODO: merge default metadata from config
       context.merge_metadata @resource.metadata
       result = rendered_content(context)

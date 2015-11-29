@@ -48,5 +48,9 @@ module MudPie
 
     # Allow a resource to be used as a Pathname
     alias_method :read, :content
+
+    def to_s
+      "#<MudPie::Resource:#{path}>"
+    end
   end
 end

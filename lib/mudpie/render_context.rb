@@ -1,8 +1,10 @@
 module MudPie
   class RenderContext
+    attr_reader :pantry
     attr_reader :metadata
 
-    def initialize
+    def initialize(pantry)
+      @pantry = pantry
       @metadata = Hash.new
     end
 

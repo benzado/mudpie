@@ -1,6 +1,9 @@
 require 'rake/clean'
+require 'rake/testtask'
 
 CLEAN.include('pkg')
+
+Rake::TestTask.new
 
 def gemspec
   @gemspec ||= eval(File.read('mudpie.gemspec'))

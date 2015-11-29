@@ -24,7 +24,7 @@ module MudPie
       else
         response['X-Served-Hot-By'] = "MudPie/#{MudPie::VERSION}"
         if request.get?
-          context = RenderContext.new
+          context = RenderContext.new(@pantry)
           context.metadata[ExecutionContext::SERVED_HOT_KEY] = true
           resource.renderer.render_to(response, context)
           response['Content-Type'] = context.content_type!

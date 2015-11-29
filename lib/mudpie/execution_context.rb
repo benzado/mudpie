@@ -1,3 +1,6 @@
+require 'mudpie/page'
+require 'mudpie/query'
+
 class MudPie::ExecutionContext
   SERVED_HOT_KEY = '#SERVED_HOT'
 
@@ -19,22 +22,21 @@ class MudPie::ExecutionContext
     @_context.metadata[SERVED_HOT_KEY]
   end
 
-  class Page
-    def initialize(context)
-      @context = context
-    end
-
-    def method_missing(symbol, *args)
-      key = symbol.to_s
-      if args.empty? && @context.metadata.has_key?(key)
-        @context.metadata[key]
-      else
-        super(symbol, *args)
-      end
-    end
+  def page
+    @_page ||= MudPie::Page.new(@_context)
   end
 
-  def page
-    @_page ||= Page.new(@_context)
+  def pages
+    MudPie::Query.new(@_context.pantry)
+  end
+
+  def content_tag(name, text, attributes)
+    # TODO: escape v properly
+    attrs = attributes.map {|n,v| %Q( #{n}="#{v}") }.join
+    "<#{name}#{attrs}>#{text}</#{name}>"
+  end
+
+  def link_to(page)
+    content_tag :a, page.title, href: page.path
   end
 end

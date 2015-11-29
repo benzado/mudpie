@@ -18,7 +18,7 @@ module MudPie::Command
         resource = pantry.resource_for_path(path)
         begin
           if resource
-            resource.renderer.render_to($stdout)
+            resource.renderer.render_to($stdout, RenderContext.new(pantry))
           else
             logger.warn "#{path}: resource not found"
           end
