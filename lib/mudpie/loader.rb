@@ -15,7 +15,7 @@ module MudPie::Loader
   end
 
   def self.add_loader_class(loader_class)
-    LOADER_CLASSES.insert 0, loader_class
+    LOADER_CLASSES << loader_class
   end
 
   def self.loader_for_path(path)
@@ -24,5 +24,6 @@ module MudPie::Loader
   end
 end
 
-require 'mudpie/loader/default' # should always be first
 require 'mudpie/loader/front_matter'
+require 'mudpie/loader/wordpress'
+require 'mudpie/loader/default' # should always be last

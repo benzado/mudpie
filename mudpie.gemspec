@@ -25,4 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rack', '~> 1.6'
   spec.add_dependency 'sqlite3', '~> 1.3'
   spec.add_dependency 'term-ansicolor', '~> 1.3'
+  # TODO: Make Optional
+  spec.add_dependency 'nokogiri', '~> 1.6'
 end
