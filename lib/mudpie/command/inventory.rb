@@ -11,7 +11,7 @@ module MudPie::Command
 
     def execute
       pantry = MudPie::Pantry.new(config)
-      pantry.each_resource do |resource|
+      pantry.resources.each do |resource|
         logger.info resource.path
         logger.info "  Stocked: #{resource.stocked_at}"
         logger.info "  Last Modified: #{resource.modified_at}"

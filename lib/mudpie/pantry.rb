@@ -82,16 +82,16 @@ module MudPie
       Resource.new(row) unless row.nil?
     end
 
-    def each_resource(&block)
+    def resources
       select_all = @db.prepare('SELECT * FROM resources ORDER BY path ASC')
-      each_resource_for_statement(select_all.execute, block)
+      resources_from_results(select_all.execute)
     end
 
-    def each_resource_for_query(query, &block)
-      sql = "SELECT * FROM resources" + query.to_sql
+    def resources_for_sql(sql_clause, bind_values)
+      sql = "SELECT * FROM resources" + sql_clause
       MudPie.logger.debug "Executing SQL: #{sql}"
-      results = @db.prepare(sql).execute(query.bind_values)
-      each_resource_from_results(results, block)
+      results = @db.prepare(sql).execute(bind_values)
+      resources_from_results(results)
     end
 
     # TODO: allow some metadata to be "indexed" (that is, stored in their own
@@ -103,11 +103,13 @@ module MudPie
 
     private
 
-    def each_resource_from_results(results, block)
-      while row = results.next_hash
-        block.call Resource.new(row)
+    def resources_from_results(results)
+      Enumerator.new do |caller|
+        while row = results.next_hash
+          caller.yield Resource.new(row)
+        end
+        results.close
       end
-      results.close
     end
   end
 end

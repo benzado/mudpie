@@ -18,10 +18,14 @@ class MudPie::Query
     self.class.new(@pantry, @where, @order, n)
   end
 
-  def each
-    @pantry.each_resource_for_query(self) do |resource|
-      yield MudPie::Page.new(resource.metadata, resource.path)
+  def all
+    @pantry.resources_for_sql(to_sql, bind_values).map do |resource|
+      MudPie::Page.new(resource.metadata, resource.path)
     end
+  end
+
+  def each(&block)
+    all.each(&block)
   end
 
   def to_sql
