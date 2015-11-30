@@ -1,9 +1,11 @@
 class MudPie::Page
-  attr_reader :path
-
-  def initialize(metadata, path = nil)
+  def initialize(metadata)
     @metadata = metadata
-    @path = path
+  end
+
+  def absolute_url
+    # TODO: fetch base URL from config, or default metadata
+    "http://localhost:4000" + @metadata['path']
   end
 
   def method_missing(symbol, *args)
@@ -13,7 +15,6 @@ class MudPie::Page
     else
       MudPie.logger.warn "undefined metadata attribute '#{key}'"
       nil
-      # super(symbol, *args)
     end
   end
 end

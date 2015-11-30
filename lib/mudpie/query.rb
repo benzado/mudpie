@@ -20,7 +20,9 @@ class MudPie::Query
 
   def all
     @pantry.resources_for_sql(to_sql, bind_values).map do |resource|
-      MudPie::Page.new(resource.metadata, resource.path)
+      metadata = resource.metadata.dup
+      metadata.merge! 'path' => resource.path
+      MudPie::Page.new(metadata)
     end
   end
 

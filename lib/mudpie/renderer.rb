@@ -26,6 +26,7 @@ module MudPie::Renderer
 
     def render_to(output, context)
       # TODO: merge default metadata from config
+      context.merge_metadata 'path' => @resource.path
       context.merge_metadata @resource.metadata
       result = rendered_content(context)
       while context.needs_layout?

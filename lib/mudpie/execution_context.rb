@@ -23,7 +23,7 @@ class MudPie::ExecutionContext
   end
 
   def page
-    @_page ||= MudPie::Page.new(@_context)
+    @_page ||= MudPie::Page.new(@_context.metadata)
   end
 
   def pages
