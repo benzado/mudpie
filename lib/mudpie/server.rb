@@ -14,7 +14,7 @@ module MudPie
         MudPie.logger.info "appending #{MudPie.config.index_name} to request for #{path}"
         path << MudPie.config.index_name
       end
-      # TODO: stock the pantry
+      @pantry.stock
       response = Rack::Response.new
       resource = @pantry.resource_for_path(path)
       if resource.nil?

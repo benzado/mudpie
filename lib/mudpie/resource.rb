@@ -1,3 +1,4 @@
+require 'pathname'
 require 'mudpie/renderer'
 
 module MudPie
@@ -6,36 +7,40 @@ module MudPie
       @row = row.dup.freeze
     end
 
+    def source_path
+      Pathname.new @row['source_path']
+    end
+
+    def source_modified_at
+      Time.at @row['source_modified_at']
+    end
+
+    def source_length
+      @row['source_length']
+    end
+
     def path
       @row['path']
     end
 
-    def modified_at
-      Time.at @row['modified_at']
-    end
-
-    def stocked_at
-      Time.at @row['stocked_at']
-    end
-
     def renderer_name
-      @row['renderer']
-    end
-
-    def renderer
-      MudPie::Renderer.renderer_class_for_name(renderer_name).new(self)
+      @row['renderer_name']
     end
 
     def metadata_yaml
       @row['metadata_yaml']
     end
 
-    def metadata
-      @metadata ||= Psych.load(metadata_yaml || '{}').freeze
-    end
-
     def content
       @row['content']
+    end
+
+    def renderer
+      MudPie::Renderer.renderer_class_for_name(renderer_name).new(self)
+    end
+
+    def metadata
+      @metadata ||= Psych.load(metadata_yaml || '{}').freeze
     end
 
     def metadata_yaml_length
@@ -48,6 +53,10 @@ module MudPie
 
     # Allow a resource to be used as a Pathname
     alias_method :read, :content
+
+    def up_to_date?
+      (source_length == source_path.size) && (source_modified_at >= source_path.mtime)
+    end
 
     def to_s
       "#<MudPie::Resource:#{path}>"

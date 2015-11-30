@@ -30,7 +30,7 @@ module MudPie::Loader
 
       MudPie::Resource.new(
         'path' => path,
-        'renderer' => renderer,
+        'renderer_name' => renderer,
         'metadata_yaml' => yaml,
         'content' => content
       )

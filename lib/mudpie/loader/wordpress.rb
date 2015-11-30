@@ -27,7 +27,7 @@ module MudPie::Loader
 
       MudPie::Resource.new(
         'path'          => path,
-        'renderer'      => 'wordpress',
+        'renderer_name' => 'wordpress',
         'metadata_yaml' => Psych.dump(meta),
         'content'       => source
       )
