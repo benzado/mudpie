@@ -49,7 +49,7 @@ end
 require 'mudpie/renderer/default'
 require 'mudpie/renderer/erb'
 require 'mudpie/renderer/markdown'
+require 'mudpie/renderer/ruby_script'
 require 'mudpie/renderer/wordpress'
 # require 'mudpie/renderer/textile'
-# require 'mudpie/renderer/ruby_script'
 # require 'mudpie/renderer/shell_script'

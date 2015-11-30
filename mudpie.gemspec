@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'term-ansicolor', '~> 1.3'
   # TODO: Make Optional
   spec.add_dependency 'nokogiri', '~> 1.6'
+  spec.add_dependency 'builder', '~> 3.2'
 end

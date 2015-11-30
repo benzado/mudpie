@@ -4,6 +4,7 @@ module MudPie::Loader
       '.erb'      => 'erb',
       '.markdown' => 'markdown',
       '.md'       => 'markdown',
+      '.rb'       => 'ruby-script',
       '.textile'  => 'textile',
     }
 

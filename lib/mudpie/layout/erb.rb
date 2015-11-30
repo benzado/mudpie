@@ -12,7 +12,7 @@ module MudPie::Layout
     end
 
     def render(context, content)
-      MudPie::ExecutionContext.new(context)._execute(@erb) { content }
+      @erb.result(MudPie::ExecutionContext.new(context)._binding { content })
     end
   end
 
