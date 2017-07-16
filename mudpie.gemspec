@@ -31,7 +31,7 @@ EOD
   s.required_ruby_version = '>= 1.9.3'
   s.add_runtime_dependency 'aws-sdk'
   s.add_runtime_dependency 'builder', '~> 3.2'
-  s.add_runtime_dependency 'json', '~> 1.7.7'
+  s.add_runtime_dependency 'json', '~> 1.7'
   s.add_runtime_dependency 'nokogiri'
   s.add_runtime_dependency 'rake', '~> 10.0'
   s.add_runtime_dependency 'redcarpet', '~> 2.2'
