@@ -29,7 +29,7 @@ EOD
 
   s.platform = Gem::Platform::RUBY
   s.required_ruby_version = '>= 1.9.3'
-  s.add_runtime_dependency 'aws-sdk'
+  s.add_runtime_dependency 'aws-sdk-v1'
   s.add_runtime_dependency 'builder', '~> 3.2'
   s.add_runtime_dependency 'json', '~> 1.7'
   s.add_runtime_dependency 'nokogiri'
