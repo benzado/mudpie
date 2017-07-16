@@ -3,16 +3,27 @@ require 'psych'
 module MudPie
   class Configuration
     CONTENT_TYPE_FOR_EXT = {
-      '.css'  => 'text/css',
+      '.css'  => 'text/css; charset=UTF-8',
       '.gif'  => 'image/gif',
-      '.html' => 'text/html',
+      '.gif'  => 'image/gif',
+      '.html' => 'text/html; charset=UTF-8',
+      '.ico'  => 'image/x-icon',
+      '.jpeg' => 'image/jpeg',
       '.jpeg' => 'image/jpeg',
       '.jpg'  => 'image/jpeg',
+      '.jpg'  => 'image/jpeg',
       '.js'   => 'application/javascript', # old IE needs text/javascript
+      '.json' => 'application/json',
+      '.pdf'  => 'application/pdf',
+      '.pl'   => 'text/plain; charset=UTF-8',
+      '.plist'=> 'application/x-plist',
       '.png'  => 'image/png',
-      '.text' => 'text/plain',
-      '.txt'  => 'text/plain',
+      '.rtf'  => 'text/rtf',
+      '.safariextz' => 'application/octet-stream',
+      '.text' => 'text/plain; charset=UTF-8',
+      '.txt'  => 'text/plain; charset=UTF-8',
       '.xml'  => 'application/xml',
+      '.zip'  => 'application/zip',
     }
 
     def initialize(path = nil)
